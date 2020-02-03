@@ -5,19 +5,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class PieceTests {
-  @Test
-  @DisplayName("equals should return true if the piece has the same color and the same position")
-  public void equalsTrue() {
-    Piece p1 = Pawn.of("a", "1", Color.WHITE);
+	@Test
+	@DisplayName("equals should return true if the piece has the same color and the same position")
+	public void equalsTrue() {
+		Piece p1 = Pawn.of("a", "1", Color.WHITE);
 		Piece p2 = Pawn.of("a", "1", Color.WHITE);
 		assertEquals(true, p1.equals(p2));
-  }
-	
+	}
+
 	@Test
-  @DisplayName("equals should return false if the piece has the same color and the same position")
-  public void equalsFalse() {
-    Piece p1 = Pawn.of("a", "1", Color.BLACK);
+	@DisplayName("equals should return false if the piece has the same color and the same position")
+	public void equalsFalse() {
+		Piece p1 = Pawn.of("a", "1", Color.BLACK);
 		Piece p2 = Pawn.of("a", "1", Color.WHITE);
 		assertEquals(false, p1.equals(p2));
-  }
+	}
 }
