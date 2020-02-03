@@ -1,15 +1,30 @@
 package com.javachess;
 
-public class Piece {
-  private String x;
-  private String y;
-  private Color c;
-  private PieceType t;
+public abstract class Piece {
+  protected String x;
+  protected String y;
+	protected Color color;
+	
+	public String getX() {
+		return this.x;
+	}
+	
+	public String getY() {
+		return this.y;
+	}
+	
+	public Color getColor() {
+		return this.color;
+	}
 
-  public Piece(String x, String y, Color c, PieceType t) {
-    this.x = x;
-    this.y = y;
-    this.c = c;
-    this.t = t;
+  @Override
+  public boolean equals(Object o) {
+    if (o instanceof Piece) {
+      Piece p = (Piece) o;
+      return this.x == p.x && this.y == p.y && this.color == p.color;
+    }
+    else {
+      return false;
+    }
   }
 }
