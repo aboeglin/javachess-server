@@ -27,11 +27,11 @@ public class Pawn extends Piece {
   public boolean canMoveTo(String x, String y, Board board) {
     return FP.pipe(
       Board.getPieceAt(x, y),
-      o -> FP.ifElse(
+      FP.ifElse(
         Optional<Piece>::isPresent,
         opt -> false, // Check if position is in diagonal and is enemy ( Feind )
         opt -> computeYOffset(y, this.y) < 3
-      ).apply(o)
+      )
     ).apply(board);
   }
 

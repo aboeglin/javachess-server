@@ -65,14 +65,24 @@ public class FP {
 		return pipe(f1, f2, f3, f4, f5, f6).andThen(f7);
 	}
 
+	public static <T, V> V ifElse(
+		Function<T, Boolean> predicate,
+		Function<T, V> ifTrue,
+		Function<T, V> ifFalse,
+		T t
+	) {
+		return predicate.apply(t).booleanValue()
+			? ifTrue.apply(t)
+			: ifFalse.apply(t);
+	}
+
+	@Curry
 	public static <T, V> Function<T, V> ifElse(
 		Function<T, Boolean> predicate,
 		Function<T, V> ifTrue,
 		Function<T, V> ifFalse
 	) {
-		return value -> predicate.apply(value).booleanValue()
-			? ifTrue.apply(value)
-			: ifFalse.apply(value);
+		return v -> ifElse(predicate, ifTrue, ifFalse, v);
 	}
 
 	public static <T> Stream<T> concat(Stream<T> s1, Stream<T> s2) {
