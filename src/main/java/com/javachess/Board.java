@@ -32,9 +32,25 @@ public class Board {
 				Bishop.of("g", "8", Color.BLACK), Bishop.of("b", "8", Color.BLACK));
 	}
 
+	private static Stream<Piece> generateKnights() {
+		return Stream.of(Knight.of("c", "1", Color.WHITE), Knight.of("f", "1", Color.WHITE),
+				Knight.of("c", "8", Color.BLACK), Knight.of("f", "8", Color.BLACK));
+	}
+
+	private static Stream<Piece> generateQueens() {
+		return Stream.of(Queen.of("d", "1", Color.WHITE), Queen.of("d", "8", Color.BLACK));
+	}
+
+	private static Stream<Piece> generateKings() {
+		return Stream.of(King.of("e", "1", Color.WHITE), King.of("e", "8", Color.BLACK));
+	}
+
 	private Board() {
-		this.pieces = FP.pipe(FP.concat(generatePawns()), FP.concat(generateRooks()),
-				FP.concat(generateBishops())).apply(Stream.of()).toArray(Piece[]::new);
+		this.pieces = FP
+				.pipe(FP.concat(generatePawns()), FP.concat(generateRooks()),
+						FP.concat(generateBishops()), FP.concat(generateKnights()),
+						FP.concat(generateQueens()), FP.concat(generateKings()))
+				.apply(Stream.of()).toArray(Piece[]::new);
 	}
 
 	public Stream<Piece> getPieces() {

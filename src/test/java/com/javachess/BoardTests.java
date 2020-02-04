@@ -49,4 +49,33 @@ class BoardTests {
 		assertEquals(Board.getPieceAt("b", "8", b).get(), Bishop.of("b", "8", Color.BLACK));
 		assertEquals(Board.getPieceAt("g", "8", b).get(), Bishop.of("g", "8", Color.BLACK));
 	}
+
+	@Test
+	@DisplayName("create should return a fresh board with 4 knights")
+	public void createKnights() {
+		Board b = Board.create();
+		assertEquals(Board.getPieceAt("c", "1", b).get(), Knight.of("c", "1", Color.WHITE));
+		assertEquals(Board.getPieceAt("f", "1", b).get(), Knight.of("f", "1", Color.WHITE));
+
+		assertEquals(Board.getPieceAt("c", "8", b).get(), Knight.of("c", "8", Color.BLACK));
+		assertEquals(Board.getPieceAt("f", "8", b).get(), Knight.of("f", "8", Color.BLACK));
+	}
+
+	@Test
+	@DisplayName("create should return a fresh board with 2 queens")
+	public void createQueens() {
+		Board b = Board.create();
+		assertEquals(Board.getPieceAt("d", "1", b).get(), Queen.of("d", "1", Color.WHITE));
+
+		assertEquals(Board.getPieceAt("d", "8", b).get(), Queen.of("d", "8", Color.BLACK));
+	}
+
+	@Test
+	@DisplayName("create should return a fresh board with 2 kings")
+	public void createKings() {
+		Board b = Board.create();
+		assertEquals(Board.getPieceAt("e", "1", b).get(), King.of("e", "1", Color.WHITE));
+
+		assertEquals(Board.getPieceAt("e", "8", b).get(), King.of("e", "8", Color.BLACK));
+	}
 }
