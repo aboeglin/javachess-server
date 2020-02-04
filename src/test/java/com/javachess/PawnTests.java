@@ -20,4 +20,19 @@ class PawnTests {
 		Piece p2 = Pawn.of("a", "1", Color.WHITE);
 		assertEquals(false, p1.equals(p2));
 	}
+
+	// @Test
+	// @DisplayName("canMoveTo should return
+	// true if a white pawn moves one step
+	// up and no piece is at that position")
+	// public void canMoveToWhiteOneStepUp()
+	// {
+	// Board b = Board.create(); // Initial
+	// board, any pawn should be
+	// // able to move one step up
+	// Piece pawn = Board.getPieceAt("d",
+	// "2", b).get();
+	// assertEquals(true,
+	// pawn.canMoveTo("d", "3", b));
+	// }
 }

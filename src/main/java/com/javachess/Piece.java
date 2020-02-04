@@ -1,21 +1,47 @@
 package com.javachess;
 
+import java.util.Map;
+import java.util.HashMap;
+
 public abstract class Piece {
 	protected String x;
 	protected String y;
 	protected Color color;
 
-	public String getX() {
-		return this.x;
+	private final static Map<String, Integer> getXPositionsMap() {
+		final Map<String, Integer> m = new HashMap<String, Integer>(8);
+		m.put("a", 1);
+		m.put("b", 2);
+		m.put("c", 3);
+		m.put("d", 4);
+		m.put("e", 5);
+		m.put("f", 6);
+		m.put("g", 7);
+		m.put("h", 8);
+		return m;
 	}
 
-	public String getY() {
-		return this.y;
+	public static String getX(Piece p) {
+		return p.x;
+	}
+
+	public static String getY(Piece p) {
+		return p.y;
+	}
+
+	public static int getXAsInt(Piece p) {
+		return Piece.getXPositionsMap().get(p.x);
+	}
+
+	public static int getYAsInt(Piece p) {
+		return Integer.parseInt(p.y);
 	}
 
 	public Color getColor() {
 		return this.color;
 	}
+
+	public abstract boolean canMoveTo(String x, String y, Board b);
 
 	@Override
 	public boolean equals(Object o) {

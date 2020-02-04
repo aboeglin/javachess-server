@@ -12,6 +12,11 @@ public class King extends Piece {
 	}
 
 	@Override
+	public boolean canMoveTo(String x, String y, Board b) {
+		return false;
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		return super.equals(o) && o instanceof King;
 	}

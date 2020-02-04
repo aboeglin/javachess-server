@@ -59,7 +59,7 @@ public class Board {
 
 	public static Optional<Piece> getPieceAt(final String x, final String y,
 			final Board b) {
-		return FP.find(p -> p.getX() == x && p.getY() == y, b.getPieces());
+		return FP.find(p -> Piece.getX(p) == x && Piece.getY(p) == y, b.getPieces());
 	}
 
 	public static Board create() {
