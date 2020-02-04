@@ -1,6 +1,7 @@
 
 package com.javachess.utils;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,33 @@ class FPTests {
 		Integer output = FP.find(x -> x == 1, s1).get();
 		Integer expected = 1;
 		assertEquals(expected, output);
+	}
+
+	@Test
+	@DisplayName("filter should filter")
+	public void filter() {
+		Stream<Integer> s1 = Stream.of(1, 2, 3, 4);
+		Stream<Integer> output = FP.filter(x -> x > 2, s1);
+		Stream<Integer> expected = Stream.of(3, 4);
+		assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
+	}
+
+	@Test
+	@DisplayName("complement should return the complement of a Predicate")
+	public void complement() {
+		Predicate<Integer> p = x -> x > 2;
+		boolean output = FP.complement(p).test(3);
+		boolean expected = false;
+		assertEquals(expected, output);
+	}
+
+	@Test
+	@DisplayName("reject should reject")
+	public void reject() {
+		Stream<Integer> s1 = Stream.of(1, 2, 3, 4);
+		Stream<Integer> output = FP.reject(x -> x > 2, s1);
+		Stream<Integer> expected = Stream.of(1, 2);
+		assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
 	}
 
 }

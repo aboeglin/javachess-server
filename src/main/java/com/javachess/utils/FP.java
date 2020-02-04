@@ -71,7 +71,7 @@ public class FP {
 		Function<T, V> ifFalse,
 		T t
 	) {
-		return predicate.apply(t).booleanValue()
+		return predicate.apply(t)
 			? ifTrue.apply(t)
 			: ifFalse.apply(t);
 	}
@@ -105,6 +105,18 @@ public class FP {
 	@Curry
 	public static <T, V> Function<Stream<T>, Stream<V>> map(Function<T, V> fn) {
 		return arr -> map(fn, arr);
+	}
+
+	public static <T> Stream<T> filter(Predicate<T> p, Stream<T> s) {
+		return s.filter(p);
+	}
+
+	public static <T> Predicate<T> complement(Predicate<T> p) {
+		return x -> !p.test(x);
+	}
+
+	public static <T> Stream<T> reject(Predicate<T> p, Stream<T> s) {
+		return filter(complement(p), s);
 	}
 
 	public static void main(String[] argv) {
