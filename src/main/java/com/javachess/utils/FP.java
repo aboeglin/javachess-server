@@ -79,6 +79,7 @@ public class FP {
 		return Stream.concat(s1, s2);
 	}
 
+	@Curry
 	public static <T> Function<Stream<T>, Stream<T>> concat(Stream<T> s1) {
 		return (Stream<T> s2) -> concat(s1, s2);
 	}
@@ -91,6 +92,7 @@ public class FP {
 		return s.map(fn);
 	}
 
+	@Curry
 	public static <T, V> Function<Stream<T>, Stream<V>> map(Function<T, V> fn) {
 		return arr -> map(fn, arr);
 	}

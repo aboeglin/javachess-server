@@ -1,5 +1,6 @@
 package com.javachess;
 
+import com.javachess.utils.Curry;
 import com.javachess.utils.FP;
 
 import java.util.Optional;
@@ -81,6 +82,11 @@ public class Board {
 
   public static Optional<Piece> getPieceAt(final String x, final String y, final Board b) {
     return FP.find(p -> Piece.getX(p) == x && Piece.getY(p) == y, b.getPieces());
+  }
+
+  @Curry
+  public static Function<Board, Optional<Piece>> getPieceAt(final String x, final String y) {
+    return b -> getPieceAt(x, y, b);
   }
 
   public static Board create() {

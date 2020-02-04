@@ -26,7 +26,7 @@ public class Pawn extends Piece {
   @Override
   public boolean canMoveTo(String x, String y, Board board) {
     return FP.pipe(
-      (Board b) -> Board.getPieceAt(x, y, b),
+      Board.getPieceAt(x, y),
       o -> FP.ifElse(
         Optional<Piece>::isPresent,
         opt -> false, // Check if position is in diagonal and is enemy ( Feind )
