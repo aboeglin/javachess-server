@@ -111,12 +111,22 @@ public class FP {
 		return s.filter(p);
 	}
 
+	@Curry
+	public static <T> Function<Stream<T>, Stream<T>> filter(Predicate<T> p) {
+		return s -> filter(p, s);
+	}
+
 	public static <T> Predicate<T> complement(Predicate<T> p) {
 		return x -> !p.test(x);
 	}
 
 	public static <T> Stream<T> reject(Predicate<T> p, Stream<T> s) {
 		return filter(complement(p), s);
+	}
+
+	@Curry
+	public static <T> Function<Stream<T>, Stream<T>> reject(Predicate<T> p) {
+		return s -> reject(p, s);
 	}
 
 	public static void main(String[] argv) {
