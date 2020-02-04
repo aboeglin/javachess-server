@@ -29,14 +29,6 @@ public abstract class Piece {
 		return p.y;
 	}
 
-	public static int getXAsInt(Piece p) {
-		return Piece.getXPositionsMap().get(p.x);
-	}
-
-	public static int getYAsInt(Piece p) {
-		return Integer.parseInt(p.y);
-	}
-
 	public Color getColor() {
 		return this.color;
 	}

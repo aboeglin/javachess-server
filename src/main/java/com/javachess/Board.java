@@ -64,15 +64,15 @@ public class Board {
   }
 
   private Board() {
-    this.pieces = FP
-      .pipe(
-        FP.concat(generatePawns()),
-        FP.concat(generateRooks()),
-        FP.concat(generateBishops()),
-        FP.concat(generateKnights()),
-        FP.concat(generateQueens()),
-        FP.concat(generateKings())
-      ).apply(Stream.of()).toArray(Piece[]::new);
+    this.pieces = FP.pipe(
+      FP.concat(generatePawns()),
+      FP.concat(generateRooks()),
+      FP.concat(generateBishops()),
+      FP.concat(generateKnights()),
+      FP.concat(generateQueens()),
+      FP.concat(generateKings()),
+      s -> s.toArray(Piece[]::new)
+    ).apply(Stream.of());
   }
 
   public Stream<Piece> getPieces() {

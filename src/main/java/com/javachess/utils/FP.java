@@ -53,6 +53,18 @@ public class FP {
 		return pipe(f1, f2, f3, f4, f5).andThen(f6);
 	}
 
+	public static <A, B, C, D, E, F, G, H> Function<A, H> pipe(
+		Function<A, B> f1,
+		Function<B, C> f2,
+		Function<C, D> f3,
+		Function<D, E> f4,
+		Function<E, F> f5,
+		Function<F, G> f6,
+		Function<G, H> f7
+	) {
+		return pipe(f1, f2, f3, f4, f5, f6).andThen(f7);
+	}
+
 	public static <T, V> Function<T, V> ifElse(
 		Function<T, Boolean> predicate,
 		Function<T, V> ifTrue,
