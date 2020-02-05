@@ -1,10 +1,5 @@
 package com.javachess;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import static com.javachess.PieceType.PAWN;
-
 public class Piece {
   protected String x;
   protected String y;

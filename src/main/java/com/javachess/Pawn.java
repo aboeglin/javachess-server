@@ -11,20 +11,7 @@ public class Pawn {
   private Pawn() {
   }
 
-  private static int computeYOffset(String y1, String y2) {
-    return F.pipe(
-      (Entry<String, String> m) -> new SimpleEntry<>(Position.yAsInt(m.getKey()), Position.yAsInt(m.getValue())),
-      (Entry<Integer, Integer> m) -> m.getKey() - m.getValue()
-    ).apply(new SimpleEntry<>(y1, y2));
-  }
 
-  // TODO: Make generic and pass Position::xAsInt or Position::yAsInt accordingly
-  private static int computeXOffset(String y1, String y2) {
-    return F.pipe(
-      (Entry<String, String> m) -> new SimpleEntry<>(Position.xAsInt(m.getKey()), Position.xAsInt(m.getValue())),
-      (Entry<Integer, Integer> m) -> m.getKey() - m.getValue()
-    ).apply(new SimpleEntry<>(y1, y2));
-  }
 
   private static boolean isValidDiagonalMove(Optional<Piece> target, Piece piece) {
     return F.pipe(
@@ -34,8 +21,8 @@ public class Pawn {
         __ -> false,
         F.pipe(
           p -> new SimpleEntry<Integer, Integer>(
-            computeXOffset(Piece.getX(p), Piece.getX(piece)),
-            computeYOffset(Piece.getY(p), Piece.getY(piece))
+            Position.computeXOffset(Piece.getX(p), Piece.getX(piece)),
+            Position.computeYOffset(Piece.getY(p), Piece.getY(piece))
           ),
           o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1
         )
@@ -46,8 +33,8 @@ public class Pawn {
   private static boolean isValidStraightMove(String toX, String toY, Piece piece) {
     return F.pipe(
       (Entry<String, String> to) -> new SimpleEntry<Integer, Integer>(
-        computeXOffset(to.getKey(), Piece.getX(piece)),
-        computeYOffset(to.getValue(), Piece.getY(piece))
+        Position.computeXOffset(to.getKey(), Piece.getX(piece)),
+        Position.computeYOffset(to.getValue(), Piece.getY(piece))
       ),
       F.ifElse(
         __ -> piece.getColor() == Color.WHITE,
