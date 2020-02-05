@@ -3,6 +3,7 @@ package com.javachess;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.Optional;
+
 import com.javachess.utils.F;
 
 public class Pawn extends Piece {
