@@ -78,4 +78,13 @@ class BoardTests {
 
 		assertEquals(Board.getPieceAt("e", "8", b).get(), King.of("e", "8", Color.BLACK));
 	}
+
+	@Test
+	@DisplayName("executeMove should return a new board the piece at the new position")
+	public void executeMove() {
+		Board b = Board.create();
+		Board result = Board.executeMove("b", "7", "b", "3", b);
+		Piece movedPiece = Board.getPieceAt("b", "3", result).get();
+		assertEquals(Pawn.of("b", "3", Color.BLACK), movedPiece);
+	}
 }

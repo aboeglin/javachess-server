@@ -3,7 +3,7 @@ package com.javachess;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.Optional;
-import com.javachess.utils.FP;
+import com.javachess.utils.F;
 
 public class Pawn extends Piece {
   private Pawn(String x, String y, Color c) {
@@ -17,7 +17,7 @@ public class Pawn extends Piece {
   }
 
   public static int computeYOffset(String y1, String y2) {
-    return FP.pipe(
+    return F.pipe(
       (Entry<String, String> m) -> new SimpleEntry<>(Position.yAsInt(m.getKey()), Position.yAsInt(m.getValue())),
       (Entry<Integer, Integer> m) -> m.getKey() - m.getValue()
     ).apply(new SimpleEntry<>(y1, y2));
@@ -25,9 +25,9 @@ public class Pawn extends Piece {
 
   @Override
   public boolean canMoveTo(String x, String y, Board board) {
-    return FP.pipe(
+    return F.pipe(
       Board.getPieceAt(x, y),
-      FP.ifElse(
+      F.ifElse(
         Optional<Piece>::isPresent,
         opt -> false, // Check if position is in diagonal and is enemy ( Feind )
         opt -> computeYOffset(y, this.y) < 3

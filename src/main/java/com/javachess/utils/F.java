@@ -5,7 +5,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class FP {
+public class F {
 
 	public static <A, B> Function<A, B> pipe(Function<A, B> f1) {
 		return f1;
@@ -132,7 +132,7 @@ public class FP {
 	public static void main(String[] argv) {
 		Function<Integer, Integer> addOne = x -> x + 1;
 		Function<Integer, Integer> addThree = x -> x + 3;
-		Function<Integer, Integer> addFour = FP.pipe(addOne, addThree);
+		Function<Integer, Integer> addFour = F.pipe(addOne, addThree);
 
 		Stream<String> s = Stream.of("1", "2", "3");
 		Stream<String> mapped = map(x -> x + "-mapped", s);
