@@ -3,22 +3,23 @@ package com.javachess;
 import java.util.Map;
 import java.util.HashMap;
 
-public abstract class Piece {
+import static com.javachess.PieceType.PAWN;
+
+public class Piece {
   protected String x;
   protected String y;
   protected Color color;
+  protected PieceType type;
 
-  private final static Map<String, Integer> getXPositionsMap() {
-    final Map<String, Integer> m = new HashMap<String, Integer>(8);
-    m.put("a", 1);
-    m.put("b", 2);
-    m.put("c", 3);
-    m.put("d", 4);
-    m.put("e", 5);
-    m.put("f", 6);
-    m.put("g", 7);
-    m.put("h", 8);
-    return m;
+  private Piece(String x, String y, Color c, PieceType t) {
+    this.x = x;
+    this.y = y;
+    this.color = c;
+    this.type = t;
+  }
+
+  public static Piece of(String x, String y, Color c, PieceType t) {
+    return new Piece(x, y, c, t);
   }
 
   public static String getX(Piece p) {
@@ -33,15 +34,28 @@ public abstract class Piece {
     return this.color;
   }
 
-  public abstract Piece moveTo(String x, String y);
+  public PieceType getType() {
+    return this.type;
+  }
 
-  public abstract boolean canMoveTo(String x, String y, Board b);
+  public static Piece moveTo(String x, String y, Piece p) {
+    return Piece.of(x, y, p.color, p.type);
+  }
+
+  public static boolean canMoveTo(String x, String y, Board b, Piece p) {
+    switch (p.type) {
+      case PAWN:
+        return Pawn.canMoveTo(x, y, b, p);
+      default:
+        return false;
+    }
+  }
 
   @Override
   public boolean equals(Object o) {
     if (o instanceof Piece) {
       Piece p = (Piece) o;
-      return this.x == p.x && this.y == p.y && this.color == p.color;
+      return this.x.equals(p.x) && this.y.equals(p.y) && this.color == p.color && this.type == p.type;
     } else {
       return false;
     }

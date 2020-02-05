@@ -14,8 +14,8 @@ public class Board {
   private static Function<Stream<String>, Stream<Piece>> colsToPieces(final Color c) {
     return F.map(
       x -> c == Color.WHITE
-        ? Pawn.of(x, "2", Color.WHITE)
-        : Pawn.of(x, "7", Color.BLACK)
+        ? Piece.of(x, "2", Color.WHITE, PieceType.PAWN)
+        : Piece.of(x, "7", Color.BLACK, PieceType.PAWN)
     );
   }
 
@@ -32,37 +32,37 @@ public class Board {
 
   private static Stream<Piece> generateRooks() {
     return Stream.of(
-      Rook.of("a", "1", Color.WHITE),
-      Rook.of("h", "1", Color.WHITE),
-      Rook.of("a", "8", Color.BLACK),
-      Rook.of("h", "8", Color.BLACK)
+      Piece.of("a", "1", Color.WHITE, PieceType.ROOK),
+      Piece.of("h", "1", Color.WHITE, PieceType.ROOK),
+      Piece.of("a", "8", Color.BLACK, PieceType.ROOK),
+      Piece.of("h", "8", Color.BLACK, PieceType.ROOK)
     );
   }
 
   private static Stream<Piece> generateBishops() {
     return Stream.of(
-      Bishop.of("b", "1", Color.WHITE),
-      Bishop.of("g", "1", Color.WHITE),
-      Bishop.of("g", "8", Color.BLACK),
-      Bishop.of("b", "8", Color.BLACK)
+      Piece.of("b", "1", Color.WHITE, PieceType.BISHOP),
+      Piece.of("g", "1", Color.WHITE, PieceType.BISHOP),
+      Piece.of("g", "8", Color.BLACK, PieceType.BISHOP),
+      Piece.of("b", "8", Color.BLACK, PieceType.BISHOP)
     );
   }
 
   private static Stream<Piece> generateKnights() {
     return Stream.of(
-      Knight.of("c", "1", Color.WHITE),
-      Knight.of("f", "1", Color.WHITE),
-      Knight.of("c", "8", Color.BLACK),
-      Knight.of("f", "8", Color.BLACK)
+      Piece.of("c", "1", Color.WHITE, PieceType.KNIGHT),
+      Piece.of("f", "1", Color.WHITE, PieceType.KNIGHT),
+      Piece.of("c", "8", Color.BLACK, PieceType.KNIGHT),
+      Piece.of("f", "8", Color.BLACK, PieceType.KNIGHT)
     );
   }
 
   private static Stream<Piece> generateQueens() {
-    return Stream.of(Queen.of("d", "1", Color.WHITE), Queen.of("d", "8", Color.BLACK));
+    return Stream.of(Piece.of("d", "1", Color.WHITE, PieceType.QUEEN), Piece.of("d", "8", Color.BLACK, PieceType.QUEEN));
   }
 
   private static Stream<Piece> generateKings() {
-    return Stream.of(King.of("e", "1", Color.WHITE), King.of("e", "8", Color.BLACK));
+    return Stream.of(Piece.of("e", "1", Color.WHITE, PieceType.KING), Piece.of("e", "8", Color.BLACK, PieceType.KING));
   }
 
   private Board() {
@@ -92,7 +92,7 @@ public class Board {
         Optional<Piece>::isPresent,
         F.pipe(
           Optional<Piece>::get,
-          piece -> F.replace(x -> x.equals(piece), piece.moveTo(toX, toY)).apply(b.getPieces()),
+          piece -> F.replace(x -> x.equals(piece), Piece.moveTo(toX, toY, piece)).apply(b.getPieces()),
           pieces -> new Board(pieces.toArray(Piece[]::new))
         ),
         __ -> b // We return the initial board if no piece was found

@@ -9,16 +9,16 @@ class PawnTests {
   @Test
   @DisplayName("equals should return true if the piece has the same color and the same position")
   public void equalsTrue() {
-    Piece p1 = Pawn.of("a", "1", Color.WHITE);
-    Piece p2 = Pawn.of("a", "1", Color.WHITE);
+    Piece p1 = Piece.of("a", "1", Color.WHITE, PieceType.PAWN);
+    Piece p2 = Piece.of("a", "1", Color.WHITE, PieceType.PAWN);
     assertEquals(true, p1.equals(p2));
   }
 
   @Test
   @DisplayName("equals should return false if the piece has the same color and the same position")
   public void equalsFalse() {
-    Piece p1 = Pawn.of("a", "1", Color.BLACK);
-    Piece p2 = Pawn.of("a", "1", Color.WHITE);
+    Piece p1 = Piece.of("a", "1", Color.BLACK, PieceType.PAWN);
+    Piece p2 = Piece.of("a", "1", Color.WHITE, PieceType.PAWN);
     assertEquals(false, p1.equals(p2));
   }
 
@@ -27,7 +27,7 @@ class PawnTests {
   public void canMoveToWhiteOneStepUp() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(true, pawn.canMoveTo("d", "3", b));
+    assertEquals(true, Pawn.canMoveTo("d", "3", b, pawn));
   }
 
   @Test
@@ -35,7 +35,7 @@ class PawnTests {
   public void canMoveToWhiteThreeStepsUp() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, pawn.canMoveTo("d", "5", b));
+    assertEquals(false, Pawn.canMoveTo("d", "5", b, pawn));
   }
 
   @Test
@@ -44,7 +44,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.executeMove("d", "2", "d", "3", b);
     Piece pawn = Board.getPieceAt("d", "3", b).get();
-    assertEquals(false, pawn.canMoveTo("d", "5", b));
+    assertEquals(false, Pawn.canMoveTo("d", "5", b, pawn));
   }
 
   @Test
@@ -53,7 +53,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.executeMove("d", "7", "d", "4", b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, pawn.canMoveTo("d", "4", b));
+    assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
   }
 
   @Test
@@ -63,8 +63,8 @@ class PawnTests {
     b = Board.executeMove("e", "7", "e", "3", b);
     b = Board.executeMove("c", "7", "c", "3", b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(true, pawn.canMoveTo("e", "3", b));
-    assertEquals(true, pawn.canMoveTo("c", "3", b));
+    assertEquals(true, Pawn.canMoveTo("e", "3", b, pawn));
+    assertEquals(true, Pawn.canMoveTo("c", "3", b, pawn));
   }
 
   @Test
@@ -73,7 +73,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.executeMove("e", "2", "e", "3", b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, pawn.canMoveTo("e", "3", b));
+    assertEquals(false, Pawn.canMoveTo("e", "3", b, pawn));
   }
 
   @Test
@@ -81,7 +81,7 @@ class PawnTests {
   public void canMoveToPieceDiagonalEmptySquare() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, pawn.canMoveTo("e", "3", b));
+    assertEquals(false, Pawn.canMoveTo("e", "3", b, pawn));
   }
 
   @Test
@@ -89,7 +89,7 @@ class PawnTests {
   public void canMoveToPieceBlackDown() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "7", b).get();
-    assertEquals(true, pawn.canMoveTo("d", "6", b));
+    assertEquals(true, Pawn.canMoveTo("d", "6", b, pawn));
   }
 
   @Test
@@ -98,7 +98,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.executeMove("d", "7", "d", "6", b);
     Piece pawn = Board.getPieceAt("d", "6", b).get();
-    assertEquals(false, pawn.canMoveTo("d", "4", b));
+    assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
   }
 
   @Test
@@ -106,6 +106,6 @@ class PawnTests {
   public void canMoveToPieceBlack3Down() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "7", b).get();
-    assertEquals(false, pawn.canMoveTo("d", "4", b));
+    assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
   }
 }

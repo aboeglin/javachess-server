@@ -6,18 +6,12 @@ import java.util.Optional;
 
 import com.javachess.utils.F;
 
-public class Pawn extends Piece {
-  private Pawn(String x, String y, Color c) {
-    this.x = x;
-    this.y = y;
-    this.color = c;
+public class Pawn {
+
+  private Pawn() {
   }
 
-  public static Pawn of(String x, String y, Color c) {
-    return new Pawn(x, y, c);
-  }
-
-  public static int computeYOffset(String y1, String y2) {
+  private static int computeYOffset(String y1, String y2) {
     return F.pipe(
       (Entry<String, String> m) -> new SimpleEntry<>(Position.yAsInt(m.getKey()), Position.yAsInt(m.getValue())),
       (Entry<Integer, Integer> m) -> m.getKey() - m.getValue()
@@ -25,27 +19,23 @@ public class Pawn extends Piece {
   }
 
   // TODO: Make generic and pass Position::xAsInt or Position::yAsInt accordingly
-  public static int computeXOffset(String y1, String y2) {
+  private static int computeXOffset(String y1, String y2) {
     return F.pipe(
       (Entry<String, String> m) -> new SimpleEntry<>(Position.xAsInt(m.getKey()), Position.xAsInt(m.getValue())),
       (Entry<Integer, Integer> m) -> m.getKey() - m.getValue()
     ).apply(new SimpleEntry<>(y1, y2));
   }
 
-  public Pawn moveTo(String x, String y) {
-    return Pawn.of(x, y, this.getColor());
-  }
-
-  private boolean isValidDiagonalMove(Optional<Piece> target) {
+  private static boolean isValidDiagonalMove(Optional<Piece> target, Piece piece) {
     return F.pipe(
       Optional<Piece>::get,
       F.ifElse(
-        p -> p.getColor() == this.getColor(),
+        p -> p.getColor() == piece.getColor(),
         __ -> false,
         F.pipe(
           p -> new SimpleEntry<Integer, Integer>(
-            computeXOffset(Piece.getX(p), Piece.getX(this)),
-            computeYOffset(Piece.getY(p), Piece.getY(this))
+            computeXOffset(Piece.getX(p), Piece.getX(piece)),
+            computeYOffset(Piece.getY(p), Piece.getY(piece))
           ),
           o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1
         )
@@ -53,36 +43,30 @@ public class Pawn extends Piece {
     ).apply(target);
   }
 
-  private boolean isValidStraightMove(String toX, String toY) {
+  private static boolean isValidStraightMove(String toX, String toY, Piece piece) {
     return F.pipe(
       (Entry<String, String> to) -> new SimpleEntry<Integer, Integer>(
-        computeXOffset(to.getKey(), Piece.getX(this)),
-        computeYOffset(to.getValue(), Piece.getY(this))
+        computeXOffset(to.getKey(), Piece.getX(piece)),
+        computeYOffset(to.getValue(), Piece.getY(piece))
       ),
       F.ifElse(
-        __ -> this.getColor() == Color.WHITE,
+        __ -> piece.getColor() == Color.WHITE,
         offsets -> offsets.getKey() == 0 && offsets.getValue() == 1
-          || offsets.getKey() == 0 && offsets.getValue() == 2 && Piece.getY(this).equals("2"),
+          || offsets.getKey() == 0 && offsets.getValue() == 2 && Piece.getY(piece).equals("2"),
         offsets -> offsets.getKey() == 0 && offsets.getValue() == -1
-          || offsets.getKey() == 0 && offsets.getValue() == -2 && Piece.getY(this).equals("7")
+          || offsets.getKey() == 0 && offsets.getValue() == -2 && Piece.getY(piece).equals("7")
       )
     ).apply(new SimpleEntry<String, String>(toX, toY));
   }
 
-  @Override
-  public boolean canMoveTo(String x, String y, Board board) {
+  public static boolean canMoveTo(String x, String y, Board board, Piece p) {
     return F.pipe(
       Board.getPieceAt(x, y),
       F.ifElse(
         Optional<Piece>::isPresent,
-        this::isValidDiagonalMove, // Check if position is in diagonal and is enemy ( Feind )
-        __ -> this.isValidStraightMove(x, y)
+        target -> Pawn.isValidDiagonalMove(target, p), // Check if position is in diagonal and is enemy ( Feind )
+        __ -> Pawn.isValidStraightMove(x, y, p)
       )
     ).apply(board);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    return super.equals(o) && o instanceof Pawn;
   }
 }
