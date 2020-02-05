@@ -1,4 +1,4 @@
-package com.javachess.utils;
+package com.javachess.util.fp;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

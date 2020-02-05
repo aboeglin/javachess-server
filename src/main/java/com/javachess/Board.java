@@ -1,7 +1,7 @@
 package com.javachess;
 
-import com.javachess.utils.Curry;
-import com.javachess.utils.F;
+import com.javachess.util.fp.Curry;
+import com.javachess.util.fp.F;
 
 import java.util.Arrays;
 import java.util.Optional;

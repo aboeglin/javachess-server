@@ -1,6 +1,6 @@
 package com.javachess;
 
-import com.javachess.utils.F;
+import com.javachess.util.fp.F;
 
 import java.util.HashMap;
 import java.util.Map;

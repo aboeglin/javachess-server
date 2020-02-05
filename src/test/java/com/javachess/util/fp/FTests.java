@@ -1,5 +1,5 @@
 
-package com.javachess.utils;
+package com.javachess.util.fp;
 
 import java.util.function.Predicate;
 import java.util.stream.Stream;

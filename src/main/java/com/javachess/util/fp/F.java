@@ -1,4 +1,4 @@
-package com.javachess.utils;
+package com.javachess.util.fp;
 
 import java.util.Optional;
 import java.util.function.Function;

@@ -4,7 +4,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import com.javachess.utils.F;
+import com.javachess.util.fp.F;
 
 public class Pawn {
 
