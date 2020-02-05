@@ -11,6 +11,10 @@ public class Queen extends Piece {
     return new Queen(x, y, c);
   }
 
+  public Queen moveTo(String x, String y) {
+    return Queen.of(x, y, this.getColor());
+  }
+
   @Override
   public boolean canMoveTo(String x, String y, Board b) {
     return false;

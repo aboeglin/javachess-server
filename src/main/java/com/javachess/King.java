@@ -11,6 +11,10 @@ public class King extends Piece {
     return new King(x, y, c);
   }
 
+  public King moveTo(String x, String y) {
+    return King.of(x, y, this.getColor());
+  }
+
   @Override
   public boolean canMoveTo(String x, String y, Board b) {
     return false;

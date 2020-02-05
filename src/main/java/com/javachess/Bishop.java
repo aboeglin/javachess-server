@@ -11,6 +11,10 @@ public class Bishop extends Piece {
     return new Bishop(x, y, c);
   }
 
+  public Bishop moveTo(String x, String y) {
+    return Bishop.of(x, y, this.getColor());
+  }
+
   @Override
   public boolean canMoveTo(String x, String y, Board b) {
     return false;

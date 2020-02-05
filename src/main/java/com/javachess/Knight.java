@@ -11,6 +11,10 @@ public class Knight extends Piece {
     return new Knight(x, y, c);
   }
 
+  public Knight moveTo(String x, String y) {
+    return Knight.of(x, y, this.getColor());
+  }
+
   @Override
   public boolean canMoveTo(String x, String y, Board b) {
     return false;

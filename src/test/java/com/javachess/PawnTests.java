@@ -32,9 +32,27 @@ class PawnTests {
 
   @Test
   @DisplayName("canMoveTo should return false if a white pawn moves three steps up")
-  public void cannotMoveToWhiteThreeStepsUp() {
+  public void canMoveToWhiteThreeStepsUp() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
     assertEquals(false, pawn.canMoveTo("d", "5", b));
+  }
+
+  @Test
+  @DisplayName("canMoveTo should return false if a piece is present at destination")
+  public void canMoveToPieceAtDestination() {
+    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
+    Board movedBlack = Board.executeMove("d", "7", "d", "4", b);
+    Piece pawn = Board.getPieceAt("d", "2", movedBlack).get();
+    assertEquals(false, pawn.canMoveTo("d", "4", movedBlack));
+  }
+
+  @Test
+  @DisplayName("canMoveTo should return true if a white piece moves one step in diagonal and a black piece is there")
+  public void canMoveToPieceDiagonal() {
+    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
+    Board movedBlack = Board.executeMove("e", "7", "e", "3", b);
+    Piece pawn = Board.getPieceAt("d", "2", movedBlack).get();
+    assertEquals(true, pawn.canMoveTo("e", "3", movedBlack));
   }
 }

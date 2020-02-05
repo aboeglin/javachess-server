@@ -130,12 +130,12 @@ public class F {
   }
 
   public static <T> Stream<T> replace(Predicate<T> p, T value, Stream<T> s) {
-		/*
-		Trick for now to closure the value and give it to the inner lambda
-		TODO: create a Closured<T> type such that:
-		Closured<Boolean> c = Closured.of(false);
-		c.mutate(newValue);
-		 */
+    /*
+    Trick for now to closure the value and give it to the inner lambda
+    TODO: create a Closured<T> type such that:
+    Closured<Boolean> c = Closured.of(false);
+    c.mutate(newValue);
+    */
     final boolean[] done = {false};
 
     return map(x -> {
@@ -145,6 +145,11 @@ public class F {
       }
       return x;
     }, s);
+  }
+
+  @Curry
+  public static <T> Function<Stream<T>, Stream<T>> replace(Predicate<T> p, T value) {
+    return s -> replace(p, value, s);
   }
 
   public static void main(String[] argv) {

@@ -33,6 +33,8 @@ public abstract class Piece {
     return this.color;
   }
 
+  public abstract Piece moveTo(String x, String y);
+
   public abstract boolean canMoveTo(String x, String y, Board b);
 
   @Override

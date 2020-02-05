@@ -12,6 +12,10 @@ public class Rook extends Piece {
     return new Rook(x, y, c);
   }
 
+  public Queen moveTo(String x, String y) {
+    return Queen.of(x, y, this.getColor());
+  }
+
   @Override
   public boolean canMoveTo(String x, String y, Board b) {
     return false;

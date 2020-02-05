@@ -85,13 +85,6 @@ public class Board {
     return Arrays.stream(this.pieces);
   }
 
-  public static Piece movePieceAtPosition(String x, String y, Piece p) {
-    if (p instanceof Pawn) {
-      return Pawn.of(x, y, p.getColor());
-    }
-    return null;
-  }
-
   public static Board executeMove(String fromX, String fromY, String toX, String toY, Board b) {
     return F.pipe(
       Board.getPieceAt(fromX, fromY),
@@ -99,12 +92,7 @@ public class Board {
         Optional<Piece>::isPresent,
         F.pipe(
           Optional<Piece>::get,
-          piece -> F.pipe(
-            // Write a replace function that does that ?
-            // Maybe replace(predicate, newValue)
-            p -> F.reject(x -> x.equals(p), b.getPieces()),
-            F.concat(Stream.of(movePieceAtPosition(toX, toY, piece)))
-          ).apply(piece),
+          piece -> F.replace(x -> x.equals(piece), piece.moveTo(toX, toY)).apply(b.getPieces()),
           pieces -> new Board(pieces.toArray(Piece[]::new))
         ),
         __ -> b // We return the initial board if no piece was found
