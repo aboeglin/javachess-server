@@ -39,12 +39,34 @@ public class Pawn extends Piece {
   private boolean isValidDiagonalMove(Optional<Piece> target) {
     return F.pipe(
       Optional<Piece>::get,
-      p -> new SimpleEntry<Integer, Integer>(
-        computeXOffset(Piece.getX(p), Piece.getX(this)),
-        computeYOffset(Piece.getY(p), Piece.getY(this))
-      ),
-      x -> x.getKey() == 1 && x.getValue() == 1
+      F.ifElse(
+        p -> p.getColor() == this.getColor(),
+        __ -> false,
+        F.pipe(
+          p -> new SimpleEntry<Integer, Integer>(
+            computeXOffset(Piece.getX(p), Piece.getX(this)),
+            computeYOffset(Piece.getY(p), Piece.getY(this))
+          ),
+          o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1
+        )
+      )
     ).apply(target);
+  }
+
+  private boolean isValidStraightMove(String toX, String toY) {
+    return F.pipe(
+      (Entry<String, String> to) -> new SimpleEntry<Integer, Integer>(
+        computeXOffset(to.getKey(), Piece.getX(this)),
+        computeYOffset(to.getValue(), Piece.getY(this))
+      ),
+      F.ifElse(
+        __ -> this.getColor() == Color.WHITE,
+        offsets -> offsets.getKey() == 0 && offsets.getValue() == 1
+          || offsets.getKey() == 0 && offsets.getValue() == 2 && Piece.getY(this).equals("2"),
+        offsets -> offsets.getKey() == 0 && offsets.getValue() == -1
+          || offsets.getKey() == 0 && offsets.getValue() == -2 && Piece.getY(this).equals("7")
+      )
+    ).apply(new SimpleEntry<String, String>(toX, toY));
   }
 
   @Override
@@ -54,7 +76,7 @@ public class Pawn extends Piece {
       F.ifElse(
         Optional<Piece>::isPresent,
         this::isValidDiagonalMove, // Check if position is in diagonal and is enemy ( Feind )
-        __ -> computeYOffset(y, this.y) < 3
+        __ -> this.isValidStraightMove(x, y)
       )
     ).apply(board);
   }
