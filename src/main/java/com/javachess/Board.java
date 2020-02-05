@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class Board {
   private final Piece[] pieces;
 
-  private static Function<Stream<String>, Stream<Piece>> colsToPieces(final Color c) {
+  private static Function<Stream<String>, Stream<Piece>> colsToPawns(final Color c) {
     return F.map(
       x -> c == Color.WHITE
         ? Piece.of(x, "2", Color.WHITE, PieceType.PAWN)
@@ -25,8 +25,8 @@ public class Board {
 
   private static Stream<Piece> generatePawns() {
     return F.concat(
-      colsToPieces(Color.WHITE).apply(getCols()),
-      colsToPieces(Color.BLACK).apply(getCols())
+      colsToPawns(Color.WHITE).apply(getCols()),
+      colsToPawns(Color.BLACK).apply(getCols())
     );
   }
 
