@@ -23,6 +23,10 @@ public class Pawn extends Piece {
     ).apply(new SimpleEntry<>(y1, y2));
   }
 
+  public Pawn moveTo(String x, String y) {
+    return Pawn.of(x, y, this.getColor());
+  }
+
   @Override
   public boolean canMoveTo(String x, String y, Board board) {
     return F.pipe(

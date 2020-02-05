@@ -91,4 +91,13 @@ class FTests {
 		assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
 	}
 
+	@Test
+	@DisplayName("replace should replace the first element that matches the predicate with the given value")
+	public void replaceOne() {
+		Stream<Integer> s = Stream.of(1, 2, 3, 4);
+		Stream<Integer> output = F.replace(x -> x > 2, 19, s);
+		Stream<Integer> expected = Stream.of(1, 2, 19, 4);
+		assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
+	}
+
 }

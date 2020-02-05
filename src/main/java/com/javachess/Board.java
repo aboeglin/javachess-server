@@ -100,6 +100,8 @@ public class Board {
         F.pipe(
           Optional<Piece>::get,
           piece -> F.pipe(
+            // Write a replace function that does that ?
+            // Maybe replace(predicate, newValue)
             p -> F.reject(x -> x.equals(p), b.getPieces()),
             F.concat(Stream.of(movePieceAtPosition(toX, toY, piece)))
           ).apply(piece),

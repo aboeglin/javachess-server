@@ -129,6 +129,24 @@ public class F {
 		return s -> reject(p, s);
 	}
 
+	public static <T> Stream<T> replace(Predicate<T> p, T value, Stream<T> s) {
+		/*
+		Trick for now to closure the value and give it to the inner lambda
+		TODO: create a Closured<T> type such that:
+		Closured<Boolean> c = Closured.of(false);
+		c.mutate(newValue);
+		 */
+		final boolean[] done = {false};
+
+		return map(x -> {
+			if (p.test(x) && !done[0]) {
+				done[0] = true;
+				return value;
+			}
+			return x;
+		}, s);
+	}
+
 	public static void main(String[] argv) {
 		Function<Integer, Integer> addOne = x -> x + 1;
 		Function<Integer, Integer> addThree = x -> x + 3;
