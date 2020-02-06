@@ -2,6 +2,8 @@ package com.javachess;
 
 import com.javachess.util.fp.F;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -28,11 +30,11 @@ public class Position {
     return computeOffset(x1, x2, Position::xAsInt);
   }
 
-  private static Function<Map.Entry<String, String>, Map.Entry<Integer, Integer>> mapTupleToIntSpace(Function<String, Integer> map) {
-    return tuple -> new HashMap.SimpleEntry<>(map.apply(tuple.getKey()), map.apply(tuple.getValue()));
+  private static Function<Entry<String, String>, Entry<Integer, Integer>> mapTupleToIntSpace(Function<String, Integer> map) {
+    return tuple -> new SimpleEntry<>(map.apply(tuple.getKey()), map.apply(tuple.getValue()));
   }
 
-  private static int computeTupleDiff(Map.Entry<Integer, Integer> tuple) {
+  private static int computeTupleDiff(Entry<Integer, Integer> tuple) {
     return tuple.getKey() - tuple.getValue();
   }
 
@@ -40,7 +42,7 @@ public class Position {
     return F.pipe(
       mapTupleToIntSpace(asIntFn),
       Position::computeTupleDiff
-    ).apply(new HashMap.SimpleEntry<>(a1, a2));
+    ).apply(new SimpleEntry<>(a1, a2));
   }
 
   public static int xAsInt(String x) {

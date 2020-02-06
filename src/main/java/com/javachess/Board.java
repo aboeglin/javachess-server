@@ -58,11 +58,17 @@ public class Board {
   }
 
   private static Stream<Piece> generateQueens() {
-    return Stream.of(Piece.of("d", "1", Color.WHITE, PieceType.QUEEN), Piece.of("d", "8", Color.BLACK, PieceType.QUEEN));
+    return Stream.of(
+      Piece.of("d", "1", Color.WHITE, PieceType.QUEEN),
+      Piece.of("d", "8", Color.BLACK, PieceType.QUEEN)
+    );
   }
 
   private static Stream<Piece> generateKings() {
-    return Stream.of(Piece.of("e", "1", Color.WHITE, PieceType.KING), Piece.of("e", "8", Color.BLACK, PieceType.KING));
+    return Stream.of(
+      Piece.of("e", "1", Color.WHITE, PieceType.KING),
+      Piece.of("e", "8", Color.BLACK, PieceType.KING)
+    );
   }
 
   private Board() {
