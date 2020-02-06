@@ -1,5 +1,5 @@
 # javachess
-![Java CI](https://github.com/aboeglin/javachess/workflows/Java%20CI/badge.svg)
+![Java CI](https://github.com/aboeglin/javachess/workflows/Main/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/aboeglin/javachess/badge.svg?branch=ci/add-test-job)](https://coveralls.io/github/aboeglin/javachess?branch=ci/add-test-job)
 
 
