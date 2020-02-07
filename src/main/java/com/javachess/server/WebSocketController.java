@@ -5,7 +5,6 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -15,16 +14,16 @@ public class WebSocketController {
   private SimpMessageSendingOperations messagingTemplate;
 
   @MessageMapping("/message")
-  @SendToUser("/queue/reply")
-  public String processMessageFromClient(@Payload String message) throws Exception {
-    System.out.println(message);
-    return "hello !";
+  public void processMessageFromClient(@Payload String message) throws Exception {
+    if (Math.random() > 0.8) {
+      throw new Exception("something went wrong !");
+    }
+    this.messagingTemplate.convertAndSend("/game-1", "Welcome !");
   }
 
   @MessageExceptionHandler
-  @SendToUser("/queue/errors")
-  public String handleException(Throwable exception) {
-    return exception.getMessage();
+  public void handleException(Throwable exception) {
+    this.messagingTemplate.convertAndSend("/errors", exception.getMessage());
   }
 
 }
