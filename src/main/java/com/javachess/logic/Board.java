@@ -1,4 +1,4 @@
-package com.javachess;
+package com.javachess.logic;
 
 import com.javachess.util.fp.Curry;
 import com.javachess.util.fp.F;

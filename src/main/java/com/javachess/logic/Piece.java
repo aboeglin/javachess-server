@@ -1,4 +1,4 @@
-package com.javachess;
+package com.javachess.logic;
 
 public class Piece {
   protected String x;

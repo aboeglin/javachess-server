@@ -1,4 +1,4 @@
-package com.javachess;
+package com.javachess.logic;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
