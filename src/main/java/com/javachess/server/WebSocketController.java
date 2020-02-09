@@ -9,6 +9,8 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -18,11 +20,13 @@ public class WebSocketController {
   private SimpMessageSendingOperations messagingTemplate;
 
   @MessageMapping("/lfg")
-  public void processMessageFromClient(
+  @SendToUser("/queue/looking")
+  public String processMessageFromClient(
     @Payload Message messageObject,
     @Payload String messageString
   ) throws Exception {
-    String sessionId = (String) messageObject.getHeaders().get("simpSessionId");
+    System.out.println("CALLED");
+    System.out.println(messageObject.getHeaders());
     Gson gson = new Gson();
     LookingForGameIn input = gson.fromJson(messageString, LookingForGameIn.class);
 
@@ -31,12 +35,14 @@ public class WebSocketController {
     // Otherwise assign him on a game with creating status, or a new game
 
     LookingForGameOut output = new LookingForGameOut(String.format("Hi %s, looking for opponent ...", input.getEmail()));
-    this.messagingTemplate.convertAndSend( sessionId, gson.toJson(output));
+
+    return gson.toJson(output);
   }
 
   @MessageExceptionHandler
-  public void handleException(Throwable exception) {
-    this.messagingTemplate.convertAndSend("/errors", exception.getMessage());
+  @SendToUser("/queue/errors")
+  public String handleException(Throwable exception) {
+    return exception.getMessage();
   }
 
 }

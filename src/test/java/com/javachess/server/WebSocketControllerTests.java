@@ -9,9 +9,15 @@ import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @ExtendWith(SpringExtension.class)
@@ -47,11 +53,16 @@ public class WebSocketControllerTests {
   @Test
   @DisplayName("It should open a socket connection")
   public void connect() throws Exception {
-    this.session.getSessionId();
-    this.session.send("/lfg", "{email: test}");
-    this.session.subscribe(this.session.getSessionId(), new TestStompFrameHandler(payload -> {
-      System.out.println(payload);
+    CompletableFuture<String> resultKeeper = new CompletableFuture<>();
+
+    this.session.subscribe("/user/queue/looking", new TestStompFrameHandler(payload -> {
+      resultKeeper.complete(payload);
     }));
+    Thread.currentThread().sleep(1000);
+
+    this.session.send("/app/lfg", "{email: test}");
+
+    assertEquals(resultKeeper.get(2, TimeUnit.SECONDS), "{\"message\":\"Hi test, looking for opponent ...\"}");
   }
 }
 
