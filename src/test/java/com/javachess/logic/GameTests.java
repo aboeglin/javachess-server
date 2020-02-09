@@ -27,4 +27,34 @@ public class GameTests {
     game = Game.addPlayer(Player.of("John"), game);
     assertEquals(Player.of("John"), game.getPlayer1());
   }
+
+  @Test
+  @DisplayName("addPlayer should add the first and then the second player when called twice")
+  public void addPlayerTwoTimes() {
+    Game game = Game.of(1);
+    game = Game.addPlayer(Player.of("John"), game);
+    game = Game.addPlayer(Player.of("Jess"), game);
+    assertEquals(Player.of("John"), game.getPlayer1());
+    assertEquals(Player.of("Jess"), game.getPlayer2());
+  }
+
+  @Test
+  @DisplayName("equals should return true if the two games have the same id and same players")
+  public void equals() {
+    Game game1 = Game.of(1, Player.of("John"), Player.of("Jess"));
+    Game game2 = Game.of(1, Player.of("John"), Player.of("Jess"));
+    assertEquals(true, game1.equals(game2));
+  }
+
+  @Test
+  @DisplayName("equals should return true even with empty players")
+  public void equalsWithNullPlayer() {
+    Game game1 = Game.of(1, null, Player.of("Jess"));
+    Game game2 = Game.of(1, null, Player.of("Jess"));
+    assertEquals(true, game1.equals(game2));
+
+    Game game3 = Game.of(1, Player.of("John"), null);
+    Game game4 = Game.of(1, Player.of("John"), null);
+    assertEquals(true, game3.equals(game4));
+  }
 }

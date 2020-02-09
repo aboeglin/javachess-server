@@ -62,7 +62,7 @@ public class WebSocketControllerTests {
 
     this.session.send("/app/lfg", "{email: test}");
 
-    assertEquals(resultKeeper.get(2, TimeUnit.SECONDS), "{\"message\":\"Hi test, looking for opponent ...\"}");
+    assertEquals(resultKeeper.get(2, TimeUnit.SECONDS), "{\"message\":\"Hi test, looking for opponent ...\",\"gameId\":1}");
   }
 }
 

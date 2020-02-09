@@ -33,7 +33,9 @@ public class Game {
   }
 
   public static Game addPlayer(Player player, Game game) {
-    return Game.of(game.id, player);
+    return game.getPlayer1() == null
+      ? Game.of(game.getId(), player)
+      : Game.of(game.getId(), game.getPlayer1(), player);
   }
 
   public int getId() {
@@ -50,5 +52,23 @@ public class Game {
 
   public boolean isComplete() {
     return this.player1 != null && this.player2 != null;
+  }
+
+  public boolean equals(Object o) {
+    if (o instanceof Game) {
+      Game game = (Game) o;
+      return game.getId() == this.getId()
+        && (
+        game.getPlayer1() != null && this.getPlayer1() != null
+          && game.getPlayer1().equals(this.getPlayer1())
+          || game.getPlayer1() == null && this.getPlayer1() == null
+      )
+        && (
+        game.getPlayer2() != null && this.getPlayer2() != null
+          && game.getPlayer2().equals(this.getPlayer2())
+          || game.getPlayer2() == null && this.getPlayer2() == null
+      );
+    }
+    return false;
   }
 }
