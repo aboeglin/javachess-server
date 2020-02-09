@@ -94,6 +94,15 @@ class FTests {
   }
 
   @Test
+  @DisplayName("last should return the last element of a stream")
+  public void last() {
+    Stream<Integer> s1 = Stream.of(1, 2, 3, 4);
+    Integer output = F.last(s1);
+    Integer expected = 4;
+    assertEquals(expected, output);
+  }
+
+  @Test
   @DisplayName("replace should replace the first element that matches the predicate with the given value")
   public void replaceOne() {
     Stream<Integer> s = Stream.of(1, 2, 3, 4);

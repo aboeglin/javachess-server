@@ -1,4 +1,4 @@
-package com.javachess;
+package com.javachess.logic;
 
 public class Main {
   public static void main(String[] argv) {

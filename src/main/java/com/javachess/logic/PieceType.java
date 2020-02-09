@@ -1,4 +1,4 @@
-package com.javachess;
+package com.javachess.logic;
 
 enum PieceType {
   PAWN,

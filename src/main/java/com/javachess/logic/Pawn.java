@@ -1,4 +1,4 @@
-package com.javachess;
+package com.javachess.logic;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
