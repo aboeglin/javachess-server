@@ -1,6 +1,6 @@
 # javachess
 ![Java CI](https://github.com/aboeglin/javachess/workflows/Main/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/aboeglin/javachess/badge.svg?branch=ci/add-test-job)](https://coveralls.io/github/aboeglin/javachess?branch=ci/add-test-job)
+[![Coverage Status](https://coveralls.io/repos/github/aboeglin/javachess/badge.svg?branch=master)](https://coveralls.io/github/aboeglin/javachess?branch=master)
 
 
 Rest API that deals with logic of chess games.
