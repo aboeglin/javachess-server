@@ -54,6 +54,14 @@ public class GameOrchestrator {
     ).apply(this.games);
   }
 
+  public Game findGameById(int id) {
+    return F.pipe(
+      (List<Game> l) -> l.stream(),
+      F.find(g -> g.getId() == id),
+      o -> o.orElse(null)
+    ).apply(this.games);
+  }
+
   public boolean isGameReady(Game g) {
     return this.joinedPlayers.contains(g.getPlayer1()) && this.joinedPlayers.contains(g.getPlayer2());
   }

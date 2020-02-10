@@ -31,7 +31,7 @@ public class GameOrchestratorTests {
   }
 
   @Test
-  @DisplayName("findGameByPlayer player should return a game when that player was already assigned one")
+  @DisplayName("findGameByPlayer should return a game when that player was already assigned one")
   public void findGameByPlayer() {
     GameOrchestrator orchestrator = new GameOrchestrator();
     Player player1 = Player.of("John");
@@ -41,7 +41,7 @@ public class GameOrchestratorTests {
   }
 
   @Test
-  @DisplayName("findGameByPlayer player should return null when that player is in no current game")
+  @DisplayName("findGameByPlayer should return null when that player is in no current game")
   public void findGameByPlayerNotFound() {
     GameOrchestrator orchestrator = new GameOrchestrator();
     Player player1 = Player.of("John");
@@ -50,6 +50,16 @@ public class GameOrchestratorTests {
     Game expected = null;
     Game actual = orchestrator.findGameByPlayer(player2);
     assertEquals(expected, actual);
+  }
+
+  @Test
+  @DisplayName("findGameById player should a game with matching id")
+  public void findGameById() {
+    GameOrchestrator orchestrator = new GameOrchestrator();
+    Player player1 = Player.of("John");
+    Game expected = orchestrator.registerPlayer(player1);
+    Game actual = orchestrator.findGameById(expected.getId());
+    assertSame(expected, actual);
   }
 
   @Test
