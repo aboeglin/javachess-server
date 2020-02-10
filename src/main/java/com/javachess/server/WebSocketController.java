@@ -45,7 +45,7 @@ public class WebSocketController {
   @SendTo("/queue/game/{id}/ready")
   public String handleGameComplete(
     @Payload String messageString,
-    @DestinationVariable int id
+    @DestinationVariable("id") int id
   ) throws Exception {
     Gson gson = new Gson();
     JoinGameIn input = gson.fromJson(messageString, JoinGameIn.class);
@@ -56,10 +56,8 @@ public class WebSocketController {
 
     // Should be find game by ID and that should fix the tests as we would then return game with id 2
     Game g = orchestrator.findGameById(id);
-    System.out.println("ID");
-    System.out.println(g.getId());
+
     if (g != null && orchestrator.isGameReady(g)) {
-      System.out.println("READY HERE");
       GameState gs = new GameState("READY", g);
       return gson.toJson(gs, GameState.class);
     }
