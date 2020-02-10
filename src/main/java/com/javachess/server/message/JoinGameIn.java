@@ -1,9 +1,9 @@
 package com.javachess.server.message;
 
-public class LogInGameRoomIn {
+public class JoinGameIn {
   private String email;
 
-  public LogInGameRoomIn(String email) {
+  public JoinGameIn(String email) {
     this.email = email;
   }
 

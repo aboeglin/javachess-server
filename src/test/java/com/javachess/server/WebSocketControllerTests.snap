@@ -1,0 +1,3 @@
+com.javachess.server.WebSocketControllerTests.joinRoom=[
+  "{\"message\":\"In the room !\nThe game will start shortly ...\"}"
+]

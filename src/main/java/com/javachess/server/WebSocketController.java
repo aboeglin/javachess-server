@@ -2,9 +2,8 @@ package com.javachess.server;
 
 import com.google.gson.Gson;
 import com.javachess.logic.Game;
-import com.javachess.logic.GameOrchestrator;
 import com.javachess.logic.Player;
-import com.javachess.server.message.LogInGameRoomIn;
+import com.javachess.server.message.JoinGameIn;
 import com.javachess.server.message.LookingForGameIn;
 import com.javachess.server.message.LookingForGameOut;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -24,7 +23,7 @@ public class WebSocketController {
   }
 
   @MessageMapping("/lfg")
-  @SendToUser("/queue/looking")
+  @SendToUser("/queue/lfg/ack")
   public String handleLFG(
     @Payload String messageString
   ) throws Exception {
@@ -44,18 +43,18 @@ public class WebSocketController {
     return gson.toJson(output);
   }
 
-  @MessageMapping("/game/{id}/enter-room")
+  @MessageMapping("/game/{id}/join")
   @SendTo("/queue/game/{id}/ready")
   public String handleGameComplete(
     @Payload String messageString
   ) throws Exception {
     Gson gson = new Gson();
-    LogInGameRoomIn input = gson.fromJson(messageString, LogInGameRoomIn.class);
+    JoinGameIn input = gson.fromJson(messageString, JoinGameIn.class);
 
     // Look up the dude, find the game, if complete, return game ready with initial board to players
 
 
-    return "In the room !\nThe game will start shortly ...";
+    return "{\"message\":\"In the room !\nThe game will start shortly ...\"}";
   }
 
   @MessageExceptionHandler

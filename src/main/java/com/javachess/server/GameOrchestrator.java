@@ -1,11 +1,18 @@
-package com.javachess.logic;
+package com.javachess.server;
+
+import com.javachess.logic.Game;
+import com.javachess.logic.Player;
+import com.javachess.util.fp.F;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GameOrchestrator {
 
   private List<Game> games;
+
+  private List<Player> joinedPlayers;
 
   private int latestGameId = 0;
 
@@ -32,6 +39,18 @@ public class GameOrchestrator {
     games.remove(lastGame);
     games.add(newGame);
     return newGame;
+  }
+
+  public void join(Player player) {
+    this.joinedPlayers.add(player);
+  }
+
+  public Game findGameByPlayer(Player p) {
+    return F.pipe(
+      (List<Game> l) -> l.stream(),
+      F.find(g -> g.getPlayer1().equals(p) || g.getPlayer2().equals(p)),
+      o -> o.orElse(null)
+    ).apply(this.games);
   }
 
 }

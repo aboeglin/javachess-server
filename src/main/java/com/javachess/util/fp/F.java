@@ -102,6 +102,11 @@ public class F {
     return s.filter(p).findFirst();
   }
 
+  @Curry
+  public static <T> Function<Stream<T>,Optional<T>> find(Predicate<T> p) {
+    return s -> s.filter(p).findFirst();
+  }
+
   public static <T, V> Stream<V> map(Function<T, V> fn, Stream<T> s) {
     return s.map(fn);
   }
