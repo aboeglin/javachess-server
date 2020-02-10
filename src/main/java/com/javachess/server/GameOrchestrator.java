@@ -18,6 +18,7 @@ public class GameOrchestrator {
 
   public GameOrchestrator() {
     this.games = new ArrayList<>();
+    this.joinedPlayers = new ArrayList<>();
   }
 
   /**
@@ -48,9 +49,13 @@ public class GameOrchestrator {
   public Game findGameByPlayer(Player p) {
     return F.pipe(
       (List<Game> l) -> l.stream(),
-      F.find(g -> g.getPlayer1().equals(p) || g.getPlayer2().equals(p)),
+      F.find(g -> p.equals(g.getPlayer1()) || p.equals(g.getPlayer2())),
       o -> o.orElse(null)
     ).apply(this.games);
+  }
+
+  public boolean isGameReady(Game g) {
+    return this.joinedPlayers.contains(g.getPlayer1()) && this.joinedPlayers.contains(g.getPlayer2());
   }
 
 }

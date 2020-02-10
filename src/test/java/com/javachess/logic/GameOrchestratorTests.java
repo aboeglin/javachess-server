@@ -46,8 +46,24 @@ public class GameOrchestratorTests {
     GameOrchestrator orchestrator = new GameOrchestrator();
     Player player1 = Player.of("John");
     Player player2 = Player.of("Jess");
+    orchestrator.registerPlayer(player1);
     Game expected = null;
     Game actual = orchestrator.findGameByPlayer(player2);
     assertEquals(expected, actual);
+  }
+
+  @Test
+  @DisplayName("isGameReady should return true if both players joined")
+  public void isGameReady() {
+    GameOrchestrator orchestrator = new GameOrchestrator();
+    Player player1 = Player.of("John");
+    Player player2 = Player.of("Jess");
+    Game game = orchestrator.registerPlayer(player1);
+    game = orchestrator.registerPlayer(player2);
+
+    orchestrator.join(player1);
+    orchestrator.join(player2);
+
+    assertEquals(true, orchestrator.isGameReady(game));
   }
 }
