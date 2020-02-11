@@ -4,20 +4,33 @@ public class Game {
   private int id;
   private Player player1;
   private Player player2;
+  private Board board;
+
+  private static final Board INITIAL_BOARD = Board.create();
 
   private Game(int id) {
     this.id = id;
+    this.board = INITIAL_BOARD;
   }
 
   private Game(int id, Player player1) {
     this.id = id;
     this.player1 = player1;
+    this.board = INITIAL_BOARD;
   }
 
   private Game(int id, Player player1, Player player2) {
     this.id = id;
     this.player1 = player1;
     this.player2 = player2;
+    this.board = INITIAL_BOARD;
+  }
+
+  private Game(int id, Player player1, Player player2, Board board) {
+    this.id = id;
+    this.player1 = player1;
+    this.player2 = player2;
+    this.board = board;
   }
 
   public static Game of(int id) {
@@ -30,6 +43,10 @@ public class Game {
 
   public static Game of(int id, Player player1, Player player2) {
     return new Game(id, player1, player2);
+  }
+
+  public static Game of(int id, Player player1, Player player2, Board board) {
+    return new Game(id, player1, player2, board);
   }
 
   public static Game addPlayer(Player player, Game game) {
@@ -48,6 +65,10 @@ public class Game {
 
   public Player getPlayer2() {
     return this.player2;
+  }
+
+  public Board getBoard() {
+    return board;
   }
 
   public boolean isComplete() {

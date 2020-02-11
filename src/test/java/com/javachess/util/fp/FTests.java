@@ -30,6 +30,45 @@ class FTests {
   }
 
   @Test
+  @DisplayName("pipe should work with 3 functions")
+  public void pipe3Functions() {
+    Integer expected = 16;
+    Integer output = F.pipe(
+      (Integer x) -> x + 1,
+      (Integer x) -> x * 2,
+      (Integer x) -> x * 2
+    ).apply(3);
+    assertEquals(expected, output);
+  }
+
+  @Test
+  @DisplayName("pipe should work with 4 functions")
+  public void pipe4Functions() {
+    Integer expected = 32;
+    Integer output = F.pipe(
+      (Integer x) -> x + 1,
+      (Integer x) -> x * 2,
+      (Integer x) -> x * 2,
+      (Integer x) -> x * 2
+    ).apply(3);
+    assertEquals(expected, output);
+  }
+
+  @Test
+  @DisplayName("pipe should work with 5 functions")
+  public void pipe5Functions() {
+    Integer expected = 64;
+    Integer output = F.pipe(
+      (Integer x) -> x + 1,
+      (Integer x) -> x * 2,
+      (Integer x) -> x * 2,
+      (Integer x) -> x * 2,
+      (Integer x) -> x * 2
+    ).apply(3);
+    assertEquals(expected, output);
+  }
+
+  @Test
   @DisplayName("pipe should work with only one arg")
   public void pipeOne() {
     Integer expected = 4;
@@ -89,6 +128,15 @@ class FTests {
   public void reject() {
     Stream<Integer> s1 = Stream.of(1, 2, 3, 4);
     Stream<Integer> output = F.reject(x -> x > 2, s1);
+    Stream<Integer> expected = Stream.of(1, 2);
+    assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
+  }
+
+  @Test
+  @DisplayName("reject should be curried")
+  public void rejectCurried() {
+    Stream<Integer> s1 = Stream.of(1, 2, 3, 4);
+    Stream<Integer> output = F.reject((Integer x) -> x > 2).apply(s1);
     Stream<Integer> expected = Stream.of(1, 2);
     assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
   }

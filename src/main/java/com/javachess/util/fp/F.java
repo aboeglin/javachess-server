@@ -102,6 +102,11 @@ public class F {
     return s.filter(p).findFirst();
   }
 
+  @Curry
+  public static <T> Function<Stream<T>,Optional<T>> find(Predicate<T> p) {
+    return s -> s.filter(p).findFirst();
+  }
+
   public static <T, V> Stream<V> map(Function<T, V> fn, Stream<T> s) {
     return s.map(fn);
   }
@@ -153,18 +158,6 @@ public class F {
   public static <T> T last(Stream<T> s1) {
     List<T> l = s1.collect(Collectors.toList());
     return l.get(l.size() - 1);
-  }
-
-  public static void main(String[] argv) {
-    Function<Integer, Integer> addOne = x -> x + 1;
-    Function<Integer, Integer> addThree = x -> x + 3;
-    Function<Integer, Integer> addFour = F.pipe(addOne, addThree);
-
-    Stream<String> s = Stream.of("1", "2", "3");
-    Stream<String> mapped = map(x -> x + "-mapped", s);
-    mapped.forEach(System.out::println);
-
-    System.out.println(addFour.apply(4));
   }
 }
 

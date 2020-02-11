@@ -9,6 +9,27 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class Position {
+
+  private String x;
+  private String y;
+
+  private Position(String x, String y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  public static Position of(String x, String y) {
+    return new Position(x, y);
+  }
+
+  public boolean equals(Object o) {
+    if (o instanceof  Position) {
+      Position p = (Position) o;
+      return p.getX().equals(this.getX()) && p.getY().equals(this.getY());
+    }
+    return false;
+  }
+
   private final static Map<String, Integer> getXPositionsMap() {
     final Map<String, Integer> m = new HashMap<String, Integer>(8);
     m.put("a", 1);
@@ -51,5 +72,13 @@ public class Position {
 
   public static int yAsInt(String y) {
     return Integer.parseInt(y);
+  }
+
+  public String getX() {
+    return x;
+  }
+
+  public String getY() {
+    return y;
   }
 }

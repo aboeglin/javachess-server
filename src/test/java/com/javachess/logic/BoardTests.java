@@ -1,9 +1,13 @@
 package com.javachess.logic;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class BoardTests {
   @Test
@@ -44,22 +48,22 @@ class BoardTests {
   @DisplayName("create should return a fresh board with 4 rooks")
   public void createBishops() {
     Board b = Board.create();
-    assertEquals(Board.getPieceAt("b", "1", b).get(), Piece.of("b", "1", Color.WHITE, PieceType.BISHOP));
-    assertEquals(Board.getPieceAt("g", "1", b).get(), Piece.of("g", "1", Color.WHITE, PieceType.BISHOP));
+    assertEquals(Board.getPieceAt("c", "1", b).get(), Piece.of("c", "1", Color.WHITE, PieceType.BISHOP));
+    assertEquals(Board.getPieceAt("f", "1", b).get(), Piece.of("f", "1", Color.WHITE, PieceType.BISHOP));
 
-    assertEquals(Board.getPieceAt("b", "8", b).get(), Piece.of("b", "8", Color.BLACK, PieceType.BISHOP));
-    assertEquals(Board.getPieceAt("g", "8", b).get(), Piece.of("g", "8", Color.BLACK, PieceType.BISHOP));
+    assertEquals(Board.getPieceAt("c", "8", b).get(), Piece.of("c", "8", Color.BLACK, PieceType.BISHOP));
+    assertEquals(Board.getPieceAt("f", "8", b).get(), Piece.of("f", "8", Color.BLACK, PieceType.BISHOP));
   }
 
   @Test
   @DisplayName("create should return a fresh board with 4 knights")
   public void createKnights() {
     Board b = Board.create();
-    assertEquals(Board.getPieceAt("c", "1", b).get(), Piece.of("c", "1", Color.WHITE, PieceType.KNIGHT));
-    assertEquals(Board.getPieceAt("f", "1", b).get(), Piece.of("f", "1", Color.WHITE, PieceType.KNIGHT));
+    assertEquals(Board.getPieceAt("b", "1", b).get(), Piece.of("b", "1", Color.WHITE, PieceType.KNIGHT));
+    assertEquals(Board.getPieceAt("g", "1", b).get(), Piece.of("g", "1", Color.WHITE, PieceType.KNIGHT));
 
-    assertEquals(Board.getPieceAt("c", "8", b).get(), Piece.of("c", "8", Color.BLACK, PieceType.KNIGHT));
-    assertEquals(Board.getPieceAt("f", "8", b).get(), Piece.of("f", "8", Color.BLACK, PieceType.KNIGHT));
+    assertEquals(Board.getPieceAt("b", "8", b).get(), Piece.of("b", "8", Color.BLACK, PieceType.KNIGHT));
+    assertEquals(Board.getPieceAt("g", "8", b).get(), Piece.of("g", "8", Color.BLACK, PieceType.KNIGHT));
   }
 
   @Test
@@ -87,5 +91,18 @@ class BoardTests {
     Board result = Board.executeMove("b", "7", "b", "3", b);
     Piece movedPiece = Board.getPieceAt("b", "3", result).get();
     assertEquals(Piece.of("b", "3", Color.BLACK, PieceType.PAWN), movedPiece);
+  }
+
+  @Test
+  @DisplayName("getPossibleMoves should return a list of possible moves")
+  public void getPossibleMoves() {
+    Board b = Board.create();
+
+    // White Pawn at start of game should have two options
+    Position[] result = Board.getPossibleMoves("b", "2", b);
+    List<Position> expected = new ArrayList<>();
+    expected.add(Position.of("b", "3"));
+    expected.add(Position.of("b", "4"));
+    assertArrayEquals(expected.toArray(), result);
   }
 }

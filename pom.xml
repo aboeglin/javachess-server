@@ -33,6 +33,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.github.json-snapshot</groupId>
+            <artifactId>json-snapshot</artifactId>
+            <version>1.0.17</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -52,9 +57,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
-                <configuration>
-                    <mainClass>com.javachess.logic.Main</mainClass>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

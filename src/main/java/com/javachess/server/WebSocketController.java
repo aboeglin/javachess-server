@@ -2,13 +2,12 @@ package com.javachess.server;
 
 import com.google.gson.Gson;
 import com.javachess.logic.Game;
-import com.javachess.logic.GameOrchestrator;
 import com.javachess.logic.Player;
+import com.javachess.server.message.GameState;
+import com.javachess.server.message.JoinGameIn;
 import com.javachess.server.message.LookingForGameIn;
 import com.javachess.server.message.LookingForGameOut;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
@@ -22,8 +21,8 @@ public class WebSocketController {
   }
 
   @MessageMapping("/lfg")
-  @SendToUser("/queue/looking")
-  public String processMessageFromClient(
+  @SendToUser("/queue/lfg/ack")
+  public String handleLFG(
     @Payload String messageString
   ) throws Exception {
     Gson gson = new Gson();
@@ -41,6 +40,35 @@ public class WebSocketController {
 
     return gson.toJson(output);
   }
+
+  @MessageMapping("/game/{id}/join")
+  @SendTo("/queue/game/{id}/ready")
+  public String handleGameComplete(
+    @Payload String messageString,
+    @DestinationVariable("id") int id
+  ) throws Exception {
+    Gson gson = new Gson();
+    JoinGameIn input = gson.fromJson(messageString, JoinGameIn.class);
+
+    // Look up the dude, find the game, if complete, return game ready with initial board to players
+    Player p = Player.of(input.getEmail());
+    orchestrator.join(p);
+
+    // Should be find game by ID and that should fix the tests as we would then return game with id 2
+    Game g = orchestrator.findGameById(id);
+
+    if (g != null && orchestrator.isGameReady(g)) {
+      GameState gs = new GameState("READY", g);
+      return gson.toJson(gs, GameState.class);
+    }
+    return null;
+  }
+
+  // @MessageMapping("/game/{id}/select-piece") -> Payload { email, x, y }
+  // @SendTo("/queue/game/{id}/possible-moves") -> Payload { possibleMoves: [{x, y}], to: {x, y} }
+
+  // @MessageMapping("/game/{id}/move-to") -> Payload { email, x, y }
+  // @SendTo("/queue/game/{id}/piece-moved") -> Payload { gameState }
 
   @MessageExceptionHandler
   @SendToUser("/queue/errors")
