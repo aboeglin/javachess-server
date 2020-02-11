@@ -64,6 +64,12 @@ public class WebSocketController {
     return null;
   }
 
+  // @MessageMapping("/game/{id}/select-piece") -> Payload { email, x, y }
+  // @SendTo("/queue/game/{id}/possible-moves") -> Payload { possibleMoves: [{x, y}], to: {x, y} }
+
+  // @MessageMapping("/game/{id}/move-to") -> Payload { email, x, y }
+  // @SendTo("/queue/game/{id}/piece-moved") -> Payload { gameState }
+
   @MessageExceptionHandler
   @SendToUser("/queue/errors")
   public String handleException(Throwable exception) {

@@ -3,9 +3,12 @@ package com.javachess.logic;
 import com.javachess.util.fp.Curry;
 import com.javachess.util.fp.F;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Board {
@@ -19,14 +22,15 @@ public class Board {
     );
   }
 
-  private static Stream<String> getCols() {
-    return Stream.of("a", "b", "c", "d", "e", "f", "g", "h");
-  }
+  private static String[] COLUMNS = new String[]{"a", "b", "c", "d", "e", "f", "g", "h"};
+  private static String[] ROWS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
+
+  private static Position[] ALL_POSITIONS = Board.buildAllPositions(COLUMNS, ROWS);
 
   private static Stream<Piece> generatePawns() {
     return F.concat(
-      colsToPawns(Color.WHITE).apply(getCols()),
-      colsToPawns(Color.BLACK).apply(getCols())
+      colsToPawns(Color.WHITE).apply(Arrays.stream(COLUMNS)),
+      colsToPawns(Color.BLACK).apply(Arrays.stream(COLUMNS))
     );
   }
 
@@ -41,19 +45,19 @@ public class Board {
 
   private static Stream<Piece> generateBishops() {
     return Stream.of(
-      Piece.of("b", "1", Color.WHITE, PieceType.BISHOP),
-      Piece.of("g", "1", Color.WHITE, PieceType.BISHOP),
-      Piece.of("g", "8", Color.BLACK, PieceType.BISHOP),
-      Piece.of("b", "8", Color.BLACK, PieceType.BISHOP)
+      Piece.of("c", "1", Color.WHITE, PieceType.BISHOP),
+      Piece.of("f", "1", Color.WHITE, PieceType.BISHOP),
+      Piece.of("c", "8", Color.BLACK, PieceType.BISHOP),
+      Piece.of("f", "8", Color.BLACK, PieceType.BISHOP)
     );
   }
 
   private static Stream<Piece> generateKnights() {
     return Stream.of(
-      Piece.of("c", "1", Color.WHITE, PieceType.KNIGHT),
-      Piece.of("f", "1", Color.WHITE, PieceType.KNIGHT),
-      Piece.of("c", "8", Color.BLACK, PieceType.KNIGHT),
-      Piece.of("f", "8", Color.BLACK, PieceType.KNIGHT)
+      Piece.of("b", "1", Color.WHITE, PieceType.KNIGHT),
+      Piece.of("g", "1", Color.WHITE, PieceType.KNIGHT),
+      Piece.of("b", "8", Color.BLACK, PieceType.KNIGHT),
+      Piece.of("g", "8", Color.BLACK, PieceType.KNIGHT)
     );
   }
 
@@ -103,6 +107,33 @@ public class Board {
         ),
         __ -> b // We return the initial board if no piece was found
       )
+    ).apply(b);
+  }
+
+  private static Position[] buildAllPositions(String[] cols, String[] rows) {
+    return F.pipe(
+      F.map(
+        (String col) -> F.map(row -> Position.of(col, row), Arrays.stream(rows))
+      ),
+      x -> x.flatMap(a -> a),
+      s -> s.toArray(Position[]::new)
+    ).apply(Arrays.stream(cols));
+  }
+
+  public static Position[] getPossibleMoves(String x, String y, Board b) {
+    return F.pipe(
+      Board.getPieceAt(x, y),
+      F.ifElse(
+        Optional<Piece>::isPresent,
+        F.pipe(
+          Optional<Piece>::get,
+          piece -> F.filter((Position p) ->
+            Piece.canMoveTo(p.getX(), p.getY(), b, piece)
+          ).apply(Arrays.stream(ALL_POSITIONS))
+        ),
+        __ -> Stream.empty()
+      ),
+      s -> s.toArray(Position[]::new)
     ).apply(b);
   }
 
