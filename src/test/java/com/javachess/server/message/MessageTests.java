@@ -29,6 +29,28 @@ public class MessageTests {
   }
 
   @Test
+  @DisplayName("LookingForGameIn should have an email field")
+  public void LookingForGameInGetters() {
+    LookingForGameIn lookingForGameIn = new LookingForGameIn("user@domain.tld");
+    String expected = "user@domain.tld";
+    String actual = lookingForGameIn.getEmail();
+
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  @DisplayName("LookingForGameIn should have an email setter")
+  public void LookingForGameInSetter() {
+    LookingForGameIn lookingForGameIn = new LookingForGameIn("user@domain.tld");
+    String expected = "expected@domain.tld";
+
+    lookingForGameIn.setEmail(expected);
+    String actual = lookingForGameIn.getEmail();
+
+    assertEquals(expected, actual);
+  }
+
+  @Test
   @DisplayName("LookingForGameOut should have message and gameId fields")
   public void LookingForGameOutGetters() {
     LookingForGameOut lookingForGameOut = new LookingForGameOut("message", 2);
