@@ -159,18 +159,6 @@ public class F {
     List<T> l = s1.collect(Collectors.toList());
     return l.get(l.size() - 1);
   }
-
-  public static void main(String[] argv) {
-    Function<Integer, Integer> addOne = x -> x + 1;
-    Function<Integer, Integer> addThree = x -> x + 3;
-    Function<Integer, Integer> addFour = F.pipe(addOne, addThree);
-
-    Stream<String> s = Stream.of("1", "2", "3");
-    Stream<String> mapped = map(x -> x + "-mapped", s);
-    mapped.forEach(System.out::println);
-
-    System.out.println(addFour.apply(4));
-  }
 }
 
 class Closured<T> {
