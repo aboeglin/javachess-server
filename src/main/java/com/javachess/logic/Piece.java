@@ -34,7 +34,7 @@ public class Piece {
   }
 
   public static Piece moveTo(String x, String y, Piece p) {
-    return Piece.of(x, y, p.color, p.type);
+    return Piece.of(x, y, p.getColor(), p.getType());
   }
 
   public static boolean canMoveTo(String x, String y, Board b, Piece p) {
@@ -50,7 +50,7 @@ public class Piece {
   public boolean equals(Object o) {
     if (o instanceof Piece) {
       Piece p = (Piece) o;
-      return this.x.equals(p.x) && this.y.equals(p.y) && this.color == p.color && this.type == p.type;
+      return this.x.equals(p.x) && this.y.equals(p.y) && this.getColor() == p.getColor() && this.getType() == p.getType();
     } else {
       return false;
     }
