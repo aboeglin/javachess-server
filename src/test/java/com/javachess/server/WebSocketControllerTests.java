@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WebSocketControllerTests {
 
   @Value("${local.server.port}")
@@ -70,7 +71,7 @@ public class WebSocketControllerTests {
   }
 
   @Test
-  @Order(1)
+  @Order(2)
   @DisplayName("It should respond with a game id")
   public void lookForGame() throws Exception {
     CompletableFuture<String> resultKeeper = new CompletableFuture<>();
@@ -90,7 +91,7 @@ public class WebSocketControllerTests {
   }
 
   @Test
-  @Order(2)
+  @Order(3)
   @DisplayName("It respond on the endpoint of the game room")
   public void joinRoom() throws Exception {
     CompletableFuture<String> lfgKeeper = new CompletableFuture<>();
@@ -119,7 +120,7 @@ public class WebSocketControllerTests {
   }
 
   @Test
-  @Order(3)
+  @Order(4)
   @DisplayName("handleSelectPiece should send /queue/game/{id}/possible-moves with an array of positions")
   public void selectPiece() throws Exception {
     CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
@@ -153,5 +154,43 @@ public class WebSocketControllerTests {
     this.session1.send(String.format("/app/game/%s/select-piece", gameJoined.getGameId()), "{email: test1, x: b, y: 2}");
 
     SnapshotMatcher.expect(possibleMovesMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
+  }
+
+  @Test
+  @Order(5)
+  @DisplayName("performMove should send /queue/game/{id}/piece-moved with a new game state")
+  public void performMove() throws Exception {
+    CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
+    CompletableFuture<String> readyMessage = new CompletableFuture<>();
+    CompletableFuture<String> stateMessage = new CompletableFuture<>();
+
+    this.session1.subscribe("/user/queue/lfg/ack", new TestStompFrameHandler(payload ->
+      lfgAckMessage.complete(payload)
+    ));
+    Thread.currentThread().sleep(300);
+
+    this.session1.send("/app/lfg", "{email: test1}");
+    Thread.currentThread().sleep(300);
+    this.session2.send("/app/lfg", "{email: test2}");
+
+    Gson gson = new Gson();
+    LookingForGameOut gameJoined = gson.fromJson(lfgAckMessage.get(2, TimeUnit.SECONDS), LookingForGameOut.class);
+
+    this.session1.subscribe(String.format("/queue/game/%s/ready", gameJoined.getGameId()), new TestStompFrameHandler(payload ->
+      readyMessage.complete(payload)
+    ));
+    this.session1.subscribe(String.format("/queue/game/%s/piece-moved", gameJoined.getGameId()), new TestStompFrameHandler(payload ->
+      stateMessage.complete(payload)
+    ));
+    Thread.currentThread().sleep(300);
+
+    this.session2.send(String.format("/app/game/%s/join", gameJoined.getGameId()), "{email: test2}");
+    Thread.currentThread().sleep(300);
+    this.session1.send(String.format("/app/game/%s/join", gameJoined.getGameId()), "{email: test1}");
+    Thread.currentThread().sleep(300);
+
+    this.session1.send(String.format("/app/game/%s/perform-move", gameJoined.getGameId()), "{email: test1, fromX: b, fromY: 2, toX: b, toY: 3}");
+
+    SnapshotMatcher.expect(stateMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
   }
 }
