@@ -124,9 +124,9 @@ public class Board {
     return F.pipe(
       Board.getPieceAt(x, y),
       F.ifElse(
-        Optional<Piece>::isPresent,
+        Optional::isPresent,
         F.pipe(
-          Optional<Piece>::get,
+          Optional::get,
           piece -> F.filter((Position p) ->
             Piece.canMoveTo(p.getX(), p.getY(), b, piece)
           ).apply(Arrays.stream(ALL_POSITIONS))
@@ -138,7 +138,7 @@ public class Board {
   }
 
   public static Optional<Piece> getPieceAt(final String x, final String y, final Board b) {
-    return F.find(p -> Piece.getX(p) == x && Piece.getY(p) == y, b.getPieces());
+    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), b.getPieces());
   }
 
   @Curry

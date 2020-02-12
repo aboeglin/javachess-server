@@ -11,8 +11,6 @@ public class Pawn {
   private Pawn() {
   }
 
-
-
   private static boolean isValidDiagonalMove(Optional<Piece> target, Piece piece) {
     return F.pipe(
       Optional<Piece>::get,
