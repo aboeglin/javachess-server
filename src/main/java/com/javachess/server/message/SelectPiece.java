@@ -5,6 +5,12 @@ public class SelectPiece {
   private String x;
   private String y;
 
+  public SelectPiece(String email, String x, String y) {
+    this.email = email;
+    this.x = x;
+    this.y = y;
+  }
+
   public String getEmail() {
     return email;
   }
