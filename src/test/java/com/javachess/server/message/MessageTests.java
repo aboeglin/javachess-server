@@ -1,8 +1,10 @@
 package com.javachess.server.message;
 
+import com.javachess.logic.Position;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MessageTests {
@@ -75,5 +77,58 @@ public class MessageTests {
 
     assertEquals("universe", message);
     assertEquals(42, id);
+  }
+
+  @Test
+  @DisplayName("PossibleMoves should have possibleMoves field")
+  public void PossibleMovesGetters() {
+    Position[] expected = {Position.of("b", "3")};
+    PossibleMoves possibleMoves = new PossibleMoves(expected);
+
+    Position[] actual = possibleMoves.getPossibleMoves();
+
+    assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  @DisplayName("PossibleMoves should have possibleMoves setter")
+  public void PossibleMovesSetters() {
+    Position[] expected = {Position.of("b", "3")};
+    PossibleMoves possibleMoves = new PossibleMoves(null);
+    possibleMoves.setPossibleMoves(expected);
+
+    Position[] actual = possibleMoves.getPossibleMoves();
+
+    assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  @DisplayName("SelectPiece should have email, x and y fields")
+  public void SelectPieceGetters() {
+    String email = "user@domain.tld";
+    String x = "a";
+    String y = "1";
+    SelectPiece selectPiece = new SelectPiece(email, x, y);
+
+    assertEquals(email, selectPiece.getEmail());
+    assertEquals(x, selectPiece.getX());
+    assertEquals(y, selectPiece.getY());
+  }
+
+  @Test
+  @DisplayName("SelectPiece should have setters for email, x and y fields")
+  public void SelectPieceSetters() {
+    String email = "user@domain.tld";
+    String x = "a";
+    String y = "1";
+    SelectPiece selectPiece = new SelectPiece("", "", "");
+
+    selectPiece.setEmail(email);
+    selectPiece.setX(x);
+    selectPiece.setY(y);
+
+    assertEquals(email, selectPiece.getEmail());
+    assertEquals(x, selectPiece.getX());
+    assertEquals(y, selectPiece.getY());
   }
 }

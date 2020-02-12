@@ -117,4 +117,41 @@ public class WebSocketControllerTests {
     this.session1.send(String.format("/app/game/%s/join", response.getGameId()), "{email: test1}");
     SnapshotMatcher.expect(resultKeeper.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
   }
+
+  @Test
+  @Order(3)
+  @DisplayName("handleSelectPiece should send /queue/game/{id}/possible-moves with an array of positions")
+  public void selectPiece() throws Exception {
+    CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
+    CompletableFuture<String> readyMessage = new CompletableFuture<>();
+    CompletableFuture<String> possibleMovesMessage = new CompletableFuture<>();
+
+    this.session1.subscribe("/user/queue/lfg/ack", new TestStompFrameHandler(payload ->
+      lfgAckMessage.complete(payload)
+    ));
+    Thread.currentThread().sleep(100);
+
+    this.session1.send("/app/lfg", "{email: test1}");
+    Thread.currentThread().sleep(100);
+    this.session2.send("/app/lfg", "{email: test2}");
+
+    Gson gson = new Gson();
+    LookingForGameOut gameJoined = gson.fromJson(lfgAckMessage.get(2, TimeUnit.SECONDS), LookingForGameOut.class);
+    this.session1.subscribe(String.format("/queue/game/%s/ready", gameJoined.getGameId()), new TestStompFrameHandler(payload ->
+      readyMessage.complete(payload)
+    ));
+    this.session1.subscribe(String.format("/queue/game/%s/possible-moves", gameJoined.getGameId()), new TestStompFrameHandler(payload ->
+      possibleMovesMessage.complete(payload)
+    ));
+    Thread.currentThread().sleep(100);
+
+    this.session2.send(String.format("/app/game/%s/join", gameJoined.getGameId()), "{email: test2}");
+    Thread.currentThread().sleep(100);
+    this.session1.send(String.format("/app/game/%s/join", gameJoined.getGameId()), "{email: test1}");
+    Thread.currentThread().sleep(100);
+
+    this.session1.send(String.format("/app/game/%s/select-piece", gameJoined.getGameId()), "{email: test1, x: b, y: 2}");
+
+    SnapshotMatcher.expect(possibleMovesMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
+  }
 }

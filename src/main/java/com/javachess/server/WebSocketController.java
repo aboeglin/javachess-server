@@ -1,12 +1,11 @@
 package com.javachess.server;
 
 import com.google.gson.Gson;
+import com.javachess.logic.Board;
 import com.javachess.logic.Game;
 import com.javachess.logic.Player;
-import com.javachess.server.message.GameState;
-import com.javachess.server.message.JoinGameIn;
-import com.javachess.server.message.LookingForGameIn;
-import com.javachess.server.message.LookingForGameOut;
+import com.javachess.logic.Position;
+import com.javachess.server.message.*;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
@@ -61,6 +60,25 @@ public class WebSocketController {
       GameState gs = new GameState("READY", g);
       return gson.toJson(gs, GameState.class);
     }
+    return null;
+  }
+
+  @MessageMapping("/game/{id}/select-piece")
+  @SendTo("/queue/game/{id}/possible-moves")
+  public String handleSelectPiece(
+    @Payload String messageString,
+    @DestinationVariable("id") int id
+  ) {
+    Gson gson = new Gson();
+    SelectPiece input = gson.fromJson(messageString, SelectPiece.class);
+    Game g = orchestrator.findGameById(id);
+
+    if (g != null) {
+      Position[] moves = Board.getPossibleMoves(input.getX(), input.getY(), g.getBoard());
+      PossibleMoves response = new PossibleMoves(moves);
+      return gson.toJson(response, PossibleMoves.class);
+    }
+
     return null;
   }
 
