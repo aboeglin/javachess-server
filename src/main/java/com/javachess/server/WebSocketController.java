@@ -1,14 +1,13 @@
 package com.javachess.server;
 
 import com.google.gson.Gson;
-import com.javachess.logic.Board;
-import com.javachess.logic.Game;
-import com.javachess.logic.Player;
-import com.javachess.logic.Position;
+import com.javachess.logic.*;
 import com.javachess.server.message.*;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+
+import java.util.Optional;
 
 @Controller
 public class WebSocketController {
@@ -82,10 +81,39 @@ public class WebSocketController {
     return null;
   }
 
-  // @MessageMapping("/game/{id}/select-piece") -> Payload { email, x, y }
-  // @SendTo("/queue/game/{id}/possible-moves") -> Payload { possibleMoves: [{x, y}], to: {x, y} }
+  @MessageMapping("/game/{id}/perform-move")
+  @SendTo("/queue/game/{id}/piece-moved")
+  public String handlePerformMove(
+    @Payload String messageString,
+    @DestinationVariable("id") int id
+  ) {
+    Gson gson = new Gson();
+    PerformMove input = gson.fromJson(messageString, PerformMove.class);
+    Game g = orchestrator.findGameById(id);
 
-  // @MessageMapping("/game/{id}/move-to") -> Payload { email, x, y }
+    if (g != null) {
+      Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), g.getBoard());
+
+      if (movingPiece.isPresent()) {
+        if (Piece.canMoveTo(input.getToX(), input.getToY(), g.getBoard(), movingPiece.get())) {
+          Board afterMove = Board.executeMove(
+            input.getFromX(), input.getFromY(),
+            input.getToX(), input.getToY(),
+            g.getBoard()
+          );
+
+          Game newGame = Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), afterMove);
+
+          GameState gs = new GameState("READY", newGame);
+          return gson.toJson(gs, GameState.class);
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // @MessageMapping("/game/{id}/perform-move") -> Payload { email, fromX, fromY, toX, toY }
   // @SendTo("/queue/game/{id}/piece-moved") -> Payload { gameState }
 
   @MessageExceptionHandler

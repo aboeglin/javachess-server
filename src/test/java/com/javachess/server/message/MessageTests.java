@@ -131,4 +131,44 @@ public class MessageTests {
     assertEquals(x, selectPiece.getX());
     assertEquals(y, selectPiece.getY());
   }
+
+  @Test
+  @DisplayName("PerformMove should have email, fromX, fromY, toX, toY fields")
+  public void PerformMoveGetters() {
+    String email = "user@domain.tld";
+    String fromX = "a";
+    String fromY = "1";
+    String toX = "b";
+    String toY = "1";
+    PerformMove performMove = new PerformMove(email, fromX, fromY, toX, toY);
+
+    assertEquals(email, performMove.getEmail());
+    assertEquals(fromX, performMove.getFromX());
+    assertEquals(fromY, performMove.getFromY());
+    assertEquals(toX, performMove.getToX());
+    assertEquals(toY, performMove.getToY());
+  }
+
+  @Test
+  @DisplayName("PerformMove should have setters for email, fromX, fromY, toX, toY fields")
+  public void PerformMoveSetters() {
+    String email = "user@domain.tld";
+    String fromX = "a";
+    String fromY = "1";
+    String toX = "b";
+    String toY = "1";
+    PerformMove performMove = new PerformMove("", "", "", "", "");
+
+    performMove.setEmail(email);
+    performMove.setFromX(fromX);
+    performMove.setFromY(fromY);
+    performMove.setToX(toX);
+    performMove.setToY(toY);
+
+    assertEquals(email, performMove.getEmail());
+    assertEquals(fromX, performMove.getFromX());
+    assertEquals(fromY, performMove.getFromY());
+    assertEquals(toX, performMove.getToX());
+    assertEquals(toY, performMove.getToY());
+  }
 }
