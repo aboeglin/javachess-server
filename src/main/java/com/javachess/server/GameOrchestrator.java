@@ -1,12 +1,15 @@
 package com.javachess.server;
 
+import com.javachess.logic.Board;
 import com.javachess.logic.Game;
+import com.javachess.logic.Piece;
 import com.javachess.logic.Player;
 import com.javachess.util.fp.F;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GameOrchestrator {
 
@@ -60,6 +63,35 @@ public class GameOrchestrator {
       F.find(g -> g.getId() == id),
       o -> o.orElse(null)
     ).apply(this.games);
+  }
+
+  public Game performMove(String fromX, String fromY, String toX, String toY, int gameId) {
+    Game g = this.findGameById(gameId);
+
+    if (g != null) {
+      Optional<Piece> movingPiece = Board.getPieceAt(fromX, fromY, g.getBoard());
+
+      if (movingPiece.isPresent()) {
+        if (Piece.canMoveTo(toX, toY, g.getBoard(), movingPiece.get())) {
+          Board afterMove = Board.executeMove(
+            fromX, fromY,
+            toX, toY,
+            g.getBoard()
+          );
+
+          Game newGame = Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), afterMove);
+          games = F.replace(
+            (Game game) -> game.getId() == newGame.getId(),
+            newGame,
+            this.games.stream()
+          ).collect(Collectors.toList());
+
+          return newGame;
+        }
+      }
+      return g;
+    }
+    return null;
   }
 
   public boolean isGameReady(Game g) {

@@ -89,36 +89,17 @@ public class WebSocketController {
   ) {
     Gson gson = new Gson();
     PerformMove input = gson.fromJson(messageString, PerformMove.class);
-    Game g = orchestrator.findGameById(id);
 
-    if (g != null) {
-      Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), g.getBoard());
+    Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), id);
 
-      if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(input.getToX(), input.getToY(), g.getBoard(), movingPiece.get())) {
-          Board afterMove = Board.executeMove(
-            input.getFromX(), input.getFromY(),
-            input.getToX(), input.getToY(),
-            g.getBoard()
-          );
-
-          Game newGame = Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), afterMove);
-
-          GameState gs = new GameState("READY", newGame);
-          return gson.toJson(gs, GameState.class);
-        }
-      }
-    }
-
-    return null;
+    GameState gs = new GameState("READY", newGame);
+    return gson.toJson(gs, GameState.class);
   }
-
-  // @MessageMapping("/game/{id}/perform-move") -> Payload { email, fromX, fromY, toX, toY }
-  // @SendTo("/queue/game/{id}/piece-moved") -> Payload { gameState }
 
   @MessageExceptionHandler
   @SendToUser("/queue/errors")
   public String handleException(Throwable exception) {
+    exception.printStackTrace();
     return exception.getMessage();
   }
 
