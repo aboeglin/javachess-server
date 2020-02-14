@@ -1,6 +1,6 @@
 package com.javachess.logic;
 
-enum Color {
+public enum Color {
   BLACK,
   WHITE
 }

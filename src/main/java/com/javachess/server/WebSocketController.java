@@ -90,10 +90,23 @@ public class WebSocketController {
     Gson gson = new Gson();
     PerformMove input = gson.fromJson(messageString, PerformMove.class);
 
-    Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), id);
+    Game game = orchestrator.findGameById(id);
+    GameState response = null;
 
-    GameState gs = new GameState("READY", newGame);
-    return gson.toJson(gs, GameState.class);
+    if (game != null) {
+      Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), game.getBoard());
+
+      if (movingPiece.isPresent()) {
+        if (Piece.canMoveTo(input.getToX(), input.getToY(), game.getBoard(), movingPiece.get())) {
+          Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
+
+          response = new GameState("READY", newGame);
+        }
+      }
+    }
+
+    return gson.toJson(response, GameState.class);
+
   }
 
   @MessageExceptionHandler

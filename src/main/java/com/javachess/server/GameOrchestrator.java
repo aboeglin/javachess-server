@@ -26,6 +26,7 @@ public class GameOrchestrator {
 
   /**
    * TODO: Should we verify that the user is in a game already first ?
+   *
    * @param player
    * @return
    */
@@ -65,33 +66,28 @@ public class GameOrchestrator {
     ).apply(this.games);
   }
 
-  public Game performMove(String fromX, String fromY, String toX, String toY, int gameId) {
-    Game g = this.findGameById(gameId);
+  public Game performMove(String fromX, String fromY, String toX, String toY, Game game) {
+    Board afterMove = Board.executeMove(
+      fromX, fromY,
+      toX, toY,
+      game.getBoard()
+    );
 
-    if (g != null) {
-      Optional<Piece> movingPiece = Board.getPieceAt(fromX, fromY, g.getBoard());
+    Game newGame = Game.of(
+      game.getId(),
+      game.getPlayer1(),
+      game.getPlayer2(),
+      afterMove,
+      Game.getOpponent(game.getActivePlayer(), game)
+    );
 
-      if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(toX, toY, g.getBoard(), movingPiece.get())) {
-          Board afterMove = Board.executeMove(
-            fromX, fromY,
-            toX, toY,
-            g.getBoard()
-          );
+    games = F.replace(
+      (Game g) -> g.getId() == newGame.getId(),
+      newGame,
+      this.games.stream()
+    ).collect(Collectors.toList());
 
-          Game newGame = Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), afterMove);
-          games = F.replace(
-            (Game game) -> game.getId() == newGame.getId(),
-            newGame,
-            this.games.stream()
-          ).collect(Collectors.toList());
-
-          return newGame;
-        }
-      }
-      return g;
-    }
-    return null;
+    return newGame;
   }
 
   public boolean isGameReady(Game g) {
