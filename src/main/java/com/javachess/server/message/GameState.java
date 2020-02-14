@@ -18,4 +18,12 @@ public class GameState {
     this.status = status;
     this.game = game;
   }
+
+  public GameState(String status, Game game, ErrorCode errorCode, String errorMessage) {
+    this.status = status;
+    this.game = game;
+    this.errorMessage = errorMessage;
+    this.errorCode = errorCode;
+    this.error = true;
+  }
 }

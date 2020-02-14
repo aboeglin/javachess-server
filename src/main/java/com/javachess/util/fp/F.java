@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -153,6 +154,28 @@ public class F {
   @Curry
   public static <T> Function<Stream<T>, Stream<T>> replace(Predicate<T> p, T value) {
     return s -> replace(p, value, s);
+  }
+
+  public static <T> Stream<T> peek(Consumer<? super T> action, Stream<T> s) {
+    return s.peek(action);
+  }
+
+  @Curry
+  public static <T> Function<Stream<T>, Stream<T>> peek(Consumer<? super T> action) {
+    return s -> s.peek(action);
+  }
+
+  public static <T> T sideEffect(Consumer<? super T> action, T s) {
+    action.accept(s);
+    return s;
+  }
+
+  @Curry
+  public static <T> Function<T, T> sideEffect(Consumer<? super T> action) {
+    return s -> {
+      action.accept(s);
+      return s;
+    };
   }
 
   public static <T> T last(Stream<T> s1) {

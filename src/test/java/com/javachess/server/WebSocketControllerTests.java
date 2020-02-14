@@ -193,4 +193,42 @@ public class WebSocketControllerTests {
 
     SnapshotMatcher.expect(stateMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
   }
+
+  @Test
+  @Order(6)
+  @DisplayName("performMove should send /queue/game/{id}/piece-moved with an error")
+  public void performMoveNotAllowed() throws Exception {
+    CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
+    CompletableFuture<String> readyMessage = new CompletableFuture<>();
+    CompletableFuture<String> stateMessage = new CompletableFuture<>();
+
+    this.session1.subscribe("/user/queue/lfg/ack", new TestStompFrameHandler(payload ->
+      lfgAckMessage.complete(payload)
+    ));
+    Thread.currentThread().sleep(300);
+
+    this.session1.send("/app/lfg", "{email: test1}");
+    Thread.currentThread().sleep(300);
+    this.session2.send("/app/lfg", "{email: test2}");
+
+    Gson gson = new Gson();
+    LookingForGameOut gameJoined = gson.fromJson(lfgAckMessage.get(2, TimeUnit.SECONDS), LookingForGameOut.class);
+
+    this.session1.subscribe(String.format("/queue/game/%s/ready", gameJoined.getGameId()), new TestStompFrameHandler(payload ->
+      readyMessage.complete(payload)
+    ));
+    this.session1.subscribe(String.format("/queue/game/%s/piece-moved", gameJoined.getGameId()), new TestStompFrameHandler(payload ->
+      stateMessage.complete(payload)
+    ));
+    Thread.currentThread().sleep(300);
+
+    this.session2.send(String.format("/app/game/%s/join", gameJoined.getGameId()), "{email: test2}");
+    Thread.currentThread().sleep(300);
+    this.session1.send(String.format("/app/game/%s/join", gameJoined.getGameId()), "{email: test1}");
+    Thread.currentThread().sleep(300);
+
+    this.session1.send(String.format("/app/game/%s/perform-move", gameJoined.getGameId()), "{email: test1, fromX: b, fromY: 2, toX: b, toY: 5}");
+
+    SnapshotMatcher.expect(stateMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
+  }
 }

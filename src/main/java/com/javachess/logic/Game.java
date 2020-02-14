@@ -1,5 +1,9 @@
 package com.javachess.logic;
 
+import com.javachess.util.fp.Curry;
+
+import java.util.function.Function;
+
 public class Game {
   private int id;
   private Player player1;
@@ -103,6 +107,11 @@ public class Game {
         getWhitePlayer(fullGame)
       );
     }
+  }
+
+  @Curry
+  public static Function<Game, Game> addPlayer(Player player) {
+    return g -> Game.addPlayer(player, g);
   }
 
   public int getId() {

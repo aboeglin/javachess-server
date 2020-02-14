@@ -102,6 +102,10 @@ public class WebSocketController {
 
           response = new GameState("READY", newGame);
         }
+        else {
+          // Piece can't move there
+          response = new GameState("UPDATE", game, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+        }
       }
     }
 

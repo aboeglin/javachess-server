@@ -31,12 +31,17 @@ public class GameOrchestrator {
    * @return
    */
   public Game registerPlayer(Player player) {
-    Game lastGame = games.size() > 0 ? games.get(games.size() - 1) : null;
+    Game lastGame = this.games.size() > 0
+      ? this.games.get(this.games.size() - 1)
+      : null;
 
     if (lastGame == null || lastGame.isComplete()) {
       latestGameId = latestGameId + 1;
-      Game newGame = Game.of(latestGameId, player);
-      games.add(newGame);
+      Game newGame = F.pipe(
+        (Integer id) -> Game.of(id),
+        Game.addPlayer(player),
+        F.sideEffect((Game g) -> games.add(g))
+      ).apply(latestGameId);
       return newGame;
     }
 
