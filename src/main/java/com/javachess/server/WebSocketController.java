@@ -56,7 +56,14 @@ public class WebSocketController {
     Game g = orchestrator.findGameById(id);
 
     if (g != null && orchestrator.isGameReady(g)) {
-      GameState gs = new GameState("READY", g);
+      GameMessage gm = new GameMessage(
+        g.getId(),
+        g.getPlayer1(),
+        g.getPlayer2(),
+        g.getActivePlayer(),
+        Board.getPieces(g.getBoard())
+      );
+      GameState gs = new GameState("READY", gm);
       return gson.toJson(gs, GameState.class);
     }
     return null;
@@ -94,17 +101,30 @@ public class WebSocketController {
     GameState response = null;
 
     if (game != null) {
-      Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), game.getBoard());
+      Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), Board.getPieces(game.getBoard()));
 
       if (movingPiece.isPresent()) {
         if (Piece.canMoveTo(input.getToX(), input.getToY(), game.getBoard(), movingPiece.get())) {
           Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
-
-          response = new GameState("READY", newGame);
+          GameMessage gm = new GameMessage(
+            newGame.getId(),
+            newGame.getPlayer1(),
+            newGame.getPlayer2(),
+            newGame.getActivePlayer(),
+            Board.getPieces(newGame.getBoard())
+          );
+          response = new GameState("UPDATE", gm);
         }
         else {
           // Piece can't move there
-          response = new GameState("UPDATE", game, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+          GameMessage gm = new GameMessage(
+            game.getId(),
+            game.getPlayer1(),
+            game.getPlayer2(),
+            game.getActivePlayer(),
+            Board.getPieces(game.getBoard())
+          );
+          response = new GameState("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
         }
       }
     }

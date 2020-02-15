@@ -42,7 +42,7 @@ class PawnTests {
   @DisplayName("canMoveTo should return false if a white pawn moves two steps up and it is not in its initial position anymore")
   public void canMoveToWhiteTwoStepsUpAfterInitialPosition() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.executeMove("d", "2", "d", "3", b);
+    b = Board.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), b);
     Piece pawn = Board.getPieceAt("d", "3", b).get();
     assertEquals(false, Pawn.canMoveTo("d", "5", b, pawn));
   }
@@ -51,7 +51,7 @@ class PawnTests {
   @DisplayName("canMoveTo should return false if a piece is present at destination")
   public void canMoveToPieceAtDestination() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.executeMove("d", "7", "d", "4", b);
+    b = Board.doMove(Move.of(Position.of("d", "7"), Position.of("d", "4")), b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
     assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
   }
@@ -60,8 +60,8 @@ class PawnTests {
   @DisplayName("canMoveTo should return true if a white piece moves one step in diagonal and a black piece is there")
   public void canMoveToPieceDiagonal() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.executeMove("e", "7", "e", "3", b);
-    b = Board.executeMove("c", "7", "c", "3", b);
+    b = Board.doMove(Move.of(Position.of("e", "7"), Position.of("e", "3")), b);
+    b = Board.doMove(Move.of(Position.of("c", "7"), Position.of("c", "3")), b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
     assertEquals(true, Pawn.canMoveTo("e", "3", b, pawn));
     assertEquals(true, Pawn.canMoveTo("c", "3", b, pawn));
@@ -71,7 +71,7 @@ class PawnTests {
   @DisplayName("canMoveTo should return false if a white piece moves one step in diagonal and a white piece is there")
   public void canMoveToPieceDiagonalSameColor() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.executeMove("e", "2", "e", "3", b);
+    b = Board.doMove(Move.of(Position.of("e", "2"), Position.of("e", "3")), b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
     assertEquals(false, Pawn.canMoveTo("e", "3", b, pawn));
   }
@@ -96,7 +96,7 @@ class PawnTests {
   @DisplayName("canMoveTo should return false if a black pawn moves two steps down and it is not in its initial position anymore")
   public void canMoveToBlackTwoStepsDownAfterInitialPosition() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.executeMove("d", "7", "d", "6", b);
+    b = Board.doMove(Move.of(Position.of("d", "7"), Position.of("d", "6")), b);
     Piece pawn = Board.getPieceAt("d", "6", b).get();
     assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
   }

@@ -6,7 +6,7 @@ public class GameState {
 
   private String status;
 
-  private Game game;
+  private GameMessage game;
 
   private boolean error;
 
@@ -14,12 +14,12 @@ public class GameState {
 
   private String errorMessage;
 
-  public GameState(String status, Game game) {
+  public GameState(String status, GameMessage game) {
     this.status = status;
     this.game = game;
   }
 
-  public GameState(String status, Game game, ErrorCode errorCode, String errorMessage) {
+  public GameState(String status, GameMessage game, ErrorCode errorCode, String errorMessage) {
     this.status = status;
     this.game = game;
     this.errorMessage = errorMessage;

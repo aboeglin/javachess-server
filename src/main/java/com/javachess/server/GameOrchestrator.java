@@ -1,9 +1,6 @@
 package com.javachess.server;
 
-import com.javachess.logic.Board;
-import com.javachess.logic.Game;
-import com.javachess.logic.Piece;
-import com.javachess.logic.Player;
+import com.javachess.logic.*;
 import com.javachess.util.fp.F;
 
 import java.util.ArrayList;
@@ -72,11 +69,7 @@ public class GameOrchestrator {
   }
 
   public Game performMove(String fromX, String fromY, String toX, String toY, Game game) {
-    Board afterMove = Board.executeMove(
-      fromX, fromY,
-      toX, toY,
-      game.getBoard()
-    );
+    Board afterMove = Board.doMove(Move.of(Position.of(fromX, fromY), Position.of(toX, toY)), game.getBoard());
 
     Game newGame = Game.of(
       game.getId(),

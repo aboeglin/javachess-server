@@ -3,6 +3,7 @@ package com.javachess.logic;
 import com.javachess.util.fp.Curry;
 import com.javachess.util.fp.F;
 
+import java.security.cert.CollectionCertStoreParameters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Board {
-  private final Piece[] pieces;
+  private final List<Move> moves;
 
   private static Function<Stream<String>, Stream<Piece>> colsToPawns(final Color c) {
     return F.map(
@@ -26,6 +27,18 @@ public class Board {
   private static String[] ROWS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
 
   private static Position[] ALL_POSITIONS = Board.buildAllPositions(COLUMNS, ROWS);
+
+  public static List<Piece> getInitialPieces() {
+    return F.pipe(
+      F.concat(generatePawns()),
+      F.concat(generateRooks()),
+      F.concat(generateBishops()),
+      F.concat(generateKnights()),
+      F.concat(generateQueens()),
+      F.concat(generateKings()),
+      s -> s.collect(Collectors.toList())
+    ).apply(Stream.of());
+  }
 
   private static Stream<Piece> generatePawns() {
     return F.concat(
@@ -76,38 +89,57 @@ public class Board {
   }
 
   private Board() {
-    this.pieces = F.pipe(
-      F.concat(generatePawns()),
-      F.concat(generateRooks()),
-      F.concat(generateBishops()),
-      F.concat(generateKnights()),
-      F.concat(generateQueens()),
-      F.concat(generateKings()),
-      s -> s.toArray(Piece[]::new)
-    ).apply(Stream.of());
+    this.moves = new ArrayList<>();
   }
 
-  private Board(Piece[] pieces) {
-    this.pieces = pieces;
+  private Board(List<Move> moves) {
+    this.moves = moves;
   }
 
-  public Stream<Piece> getPieces() {
-    return Arrays.stream(this.pieces);
+  public static Board of() {
+    return new Board();
   }
 
-  public static Board executeMove(String fromX, String fromY, String toX, String toY, Board b) {
+  public static Board of(List<Move> moves) {
+    return new Board(moves);
+  }
+
+  public List<Move> getMoves() {
+    return this.moves;
+  }
+
+  public static Board doMove(Move move, Board b) {
     return F.pipe(
-      Board.getPieceAt(fromX, fromY),
+      (Stream<Move> s) -> F.concat(s, Stream.of(move)),
+      m -> m.collect(Collectors.toList()),
+      Board::of
+    ).apply(b.getMoves().stream());
+  }
+
+  public static List<Piece> getPieces(Board b) {
+    List<Piece> pieces = Board.getInitialPieces();
+    for (Move m : b.getMoves()) {
+      pieces = applyMove(m, pieces);
+    }
+    return pieces;
+  }
+
+  public static List<Piece> applyMove(Move move, List<Piece> pieces) {
+    return F.pipe(
+      (Move m) -> Board.getPieceAt(m.getFrom().getX(), m.getFrom().getY(), pieces),
       F.ifElse(
-        Optional<Piece>::isPresent,
+        Optional::isPresent,
         F.pipe(
-          Optional<Piece>::get,
-          piece -> F.replace(x -> x.equals(piece), Piece.moveTo(toX, toY, piece)).apply(b.getPieces()),
-          pieces -> new Board(pieces.toArray(Piece[]::new))
+          Optional::get,
+          (Piece piece) -> F.replace(
+            x -> x.equals(piece),
+            Piece.moveTo(move.getTo().getX(), move.getTo().getY(), piece)
+          ).apply(pieces.stream()),
+          s -> s.collect(Collectors.toList())
         ),
-        __ -> b // We return the initial board if no piece was found
+        __ -> pieces // We return the initial Pieces if no piece was found
       )
-    ).apply(b);
+    ).apply(move);
   }
 
   private static Position[] buildAllPositions(String[] cols, String[] rows) {
@@ -128,7 +160,7 @@ public class Board {
         F.pipe(
           Optional::get,
           piece -> F.filter((Position p) ->
-            Piece.canMoveTo(p.getX(), p.getY(), b, piece)
+            Piece.canMoveTo(p.getX(), p.getY(), b, piece) // should pass array of pieces instead of board for performance
           ).apply(Arrays.stream(ALL_POSITIONS))
         ),
         __ -> Stream.empty()
@@ -137,8 +169,12 @@ public class Board {
     ).apply(b);
   }
 
-  public static Optional<Piece> getPieceAt(final String x, final String y, final Board b) {
-    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), b.getPieces());
+  public static Optional<Piece> getPieceAt(String x, String y, List<Piece> pieces) {
+    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), pieces.stream());
+  }
+
+  public static Optional<Piece> getPieceAt(String x, String y, Board b) {
+    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), Board.getPieces(b).stream());
   }
 
   @Curry
