@@ -180,14 +180,6 @@ public class F {
     List<T> l = s1.collect(Collectors.toList());
     return l.get(l.size() - 1);
   }
-
-//  public static <T> Optional<T> reduce(BinaryOperator<T> accumulator, Stream<T> s) {
-//    return s.reduce(accumulator);
-//  }
-
-  public static <U, T> U reduce(U identity, BiFunction<U,? super T,U> accumulator, Stream<T> s) {
-    return s.reduce(identity, accumulator, (x, t) -> x);
-  }
 }
 
 class Closured<T> {

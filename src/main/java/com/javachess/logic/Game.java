@@ -134,6 +134,7 @@ public class Game {
     return board;
   }
 
+  // public static boolean isComplete(Game g) ?
   public boolean isComplete() {
     return this.player1 != null && this.player2 != null;
   }

@@ -1,6 +1,7 @@
-package com.javachess.logic;
+package com.javachess.server;
 
-import com.javachess.server.GameOrchestrator;
+import com.javachess.logic.Game;
+import com.javachess.logic.Player;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

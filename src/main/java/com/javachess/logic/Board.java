@@ -43,11 +43,14 @@ public class Board {
     return this.moves;
   }
 
+  // Move to Game such that :
+  // public static Game doMove(Move move, Game g)
   public static Board doMove(Move move, Board b) {
     return F.pipe(
       (Stream<Move> s) -> F.concat(s, Stream.of(move)),
       m -> m.collect(Collectors.toList()),
       Board::of
+      // b -> game.of(game..., b)
     ).apply(b.getMoves().stream());
   }
 

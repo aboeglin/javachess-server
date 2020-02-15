@@ -84,9 +84,6 @@ class BoardTests {
     assertEquals(Board.getPieceAt("e", "8", pieces).get(), Piece.of("e", "8", Color.BLACK, PieceType.KING));
   }
 
-//  @Test
-//  @DisplayName("getInitialPieces should return 32 pieces with their initial positions")
-
   @Test
   @DisplayName("executeMove should return a new board the piece at the new position")
   public void executeMove() {
@@ -108,4 +105,6 @@ class BoardTests {
     expected.add(Position.of("b", "4"));
     assertArrayEquals(expected.toArray(), result);
   }
+
+  // Test the following: applyMove, doMoveIfPossible, doMove, getPieceAt
 }
