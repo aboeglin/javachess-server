@@ -80,7 +80,7 @@ public class WebSocketController {
     Game g = orchestrator.findGameById(id);
 
     if (g != null) {
-      Position[] moves = Board.getPossibleMoves(input.getX(), input.getY(), g.getBoard());
+      Position[] moves = Board.getPossibleMoves(input.getX(), input.getY(), Board.getPieces(g.getBoard()));
       PossibleMoves response = new PossibleMoves(moves);
       return gson.toJson(response, PossibleMoves.class);
     }
@@ -104,7 +104,7 @@ public class WebSocketController {
       Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), Board.getPieces(game.getBoard()));
 
       if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(input.getToX(), input.getToY(), game.getBoard(), movingPiece.get())) {
+        if (Piece.canMoveTo(input.getToX(), input.getToY(), Board.getPieces(game.getBoard()), movingPiece.get())) {
           Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
           GameMessage gm = new GameMessage(
             newGame.getId(),

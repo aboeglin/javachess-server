@@ -1,5 +1,7 @@
 package com.javachess.logic;
 
+import java.util.List;
+
 public class Piece {
   protected String x;
   protected String y;
@@ -37,10 +39,10 @@ public class Piece {
     return Piece.of(x, y, p.getColor(), p.getType());
   }
 
-  public static boolean canMoveTo(String x, String y, Board b, Piece p) {
+  public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece p) {
     switch (p.type) {
       case PAWN:
-        return Pawn.canMoveTo(x, y, b, p);
+        return Pawn.canMoveTo(x, y, pieces, p);
       default:
         return false;
     }

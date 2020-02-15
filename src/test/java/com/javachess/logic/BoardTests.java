@@ -102,7 +102,7 @@ class BoardTests {
     Board b = Board.create();
 
     // White Pawn at start of game should have two options
-    Position[] result = Board.getPossibleMoves("b", "2", b);
+    Position[] result = Board.getPossibleMoves("b", "2", Board.getPieces(b));
     List<Position> expected = new ArrayList<>();
     expected.add(Position.of("b", "3"));
     expected.add(Position.of("b", "4"));

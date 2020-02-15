@@ -27,7 +27,7 @@ class PawnTests {
   public void canMoveToWhiteOneStepUp() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(true, Pawn.canMoveTo("d", "3", b, pawn));
+    assertEquals(true, Pawn.canMoveTo("d", "3", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -35,7 +35,7 @@ class PawnTests {
   public void canMoveToWhiteThreeStepsUp() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("d", "5", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -44,7 +44,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), b);
     Piece pawn = Board.getPieceAt("d", "3", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("d", "5", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -53,7 +53,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.doMove(Move.of(Position.of("d", "7"), Position.of("d", "4")), b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("d", "4", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -63,8 +63,8 @@ class PawnTests {
     b = Board.doMove(Move.of(Position.of("e", "7"), Position.of("e", "3")), b);
     b = Board.doMove(Move.of(Position.of("c", "7"), Position.of("c", "3")), b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(true, Pawn.canMoveTo("e", "3", b, pawn));
-    assertEquals(true, Pawn.canMoveTo("c", "3", b, pawn));
+    assertEquals(true, Pawn.canMoveTo("e", "3", Board.getPieces(b), pawn));
+    assertEquals(true, Pawn.canMoveTo("c", "3", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -73,7 +73,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.doMove(Move.of(Position.of("e", "2"), Position.of("e", "3")), b);
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("e", "3", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("e", "3", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -81,7 +81,7 @@ class PawnTests {
   public void canMoveToPieceDiagonalEmptySquare() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("e", "3", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("e", "3", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -89,7 +89,7 @@ class PawnTests {
   public void canMoveToPieceBlackDown() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "7", b).get();
-    assertEquals(true, Pawn.canMoveTo("d", "6", b, pawn));
+    assertEquals(true, Pawn.canMoveTo("d", "6", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -98,7 +98,7 @@ class PawnTests {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     b = Board.doMove(Move.of(Position.of("d", "7"), Position.of("d", "6")), b);
     Piece pawn = Board.getPieceAt("d", "6", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("d", "4", Board.getPieces(b), pawn));
   }
 
   @Test
@@ -106,6 +106,6 @@ class PawnTests {
   public void canMoveToPieceBlack3Down() {
     Board b = Board.create(); // Initial board, any pawn should be able to move one step up
     Piece pawn = Board.getPieceAt("d", "7", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", b, pawn));
+    assertEquals(false, Pawn.canMoveTo("d", "4", Board.getPieces(b), pawn));
   }
 }

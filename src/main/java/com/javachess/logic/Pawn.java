@@ -1,6 +1,7 @@
 package com.javachess.logic;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 
@@ -44,14 +45,14 @@ public class Pawn {
     ).apply(new SimpleEntry<String, String>(toX, toY));
   }
 
-  public static boolean canMoveTo(String x, String y, Board board, Piece p) {
+  public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece p) {
     return F.pipe(
       Board.getPieceAt(x, y),
       F.ifElse(
-        Optional<Piece>::isPresent,
+        Optional::isPresent,
         target -> Pawn.isValidDiagonalMove(target, p), // Check if position is in diagonal and is enemy ( Feind )
         __ -> Pawn.isValidStraightMove(x, y, p)
       )
-    ).apply(board);
+    ).apply(pieces);
   }
 }

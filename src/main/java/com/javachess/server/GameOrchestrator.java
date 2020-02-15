@@ -5,7 +5,6 @@ import com.javachess.util.fp.F;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GameOrchestrator {
@@ -79,7 +78,7 @@ public class GameOrchestrator {
       Game.getOpponent(game.getActivePlayer(), game)
     );
 
-    games = F.replace(
+    this.games = F.replace(
       (Game g) -> g.getId() == newGame.getId(),
       newGame,
       this.games.stream()
