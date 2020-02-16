@@ -20,7 +20,6 @@ public class Game {
 
   private static String[] COLUMNS = new String[]{"a", "b", "c", "d", "e", "f", "g", "h"};
   private static String[] ROWS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
-
   private static Position[] ALL_POSITIONS = Game.buildAllPositions(COLUMNS, ROWS);
 
   private static Position[] buildAllPositions(String[] cols, String[] rows) {
@@ -32,6 +31,12 @@ public class Game {
       s -> s.toArray(Position[]::new)
     ).apply(Arrays.stream(cols));
   }
+
+  /*********************************************************************************************************************
+   *
+   * START: Constructors
+   *
+   ********************************************************************************************************************/
 
   private Game(int id) {
     this.id = id;
@@ -74,17 +79,11 @@ public class Game {
     return new Game(id, player1, player2, moves);
   }
 
-  public List<Move> getMoves() {
-    return this.moves;
-  }
-
-  private static Color getRandomColor() {
-    return Color.WHITE;
-  }
-
-  private static Color getComplementColor(Color c) {
-    return c == Color.WHITE ? Color.BLACK : Color.WHITE;
-  }
+  /*********************************************************************************************************************
+   *
+   * END: Constructors
+   *
+   ********************************************************************************************************************/
 
   private static Player getWhitePlayer(Game g) {
     return g.getPlayer1().getColor() == Color.WHITE
@@ -100,23 +99,16 @@ public class Game {
 
   public static Game addPlayer(Player player, Game game) {
     if (game.getPlayer1() == null) {
-      Player colorized = Player.of(player.getId(), getRandomColor());
+      Player colorized = Player.of(player.getId(), Color.getRandomColor());
       return Game.of(game.getId(), colorized);
     }
     else {
       Player colorized = Player.of(
         player.getId(),
-        getComplementColor(game.getPlayer1().getColor())
+        Color.getComplementColor(game.getPlayer1().getColor())
       );
 
-      Game fullGame = Game.of(game.getId(), game.getPlayer1(), colorized);
-
-      return Game.of(
-        fullGame.getId(),
-        fullGame.getPlayer1(),
-        fullGame.getPlayer2(),
-        fullGame.getMoves()
-      );
+      return Game.of(game.getId(), game.getPlayer1(), colorized);
     }
   }
 
@@ -201,6 +193,22 @@ public class Game {
 //    return b;
 //  }
 
+  public static Player getActivePlayer(Game g) {
+    return g.getMoves().size() % 2 == 0
+      ? Game.getWhitePlayer(g)
+      : Game.getBlackPlayer(g);
+  }
+
+  public static boolean isComplete(Game g) {
+    return g.getPlayer1() != null && g.getPlayer2() != null;
+  }
+
+  /*********************************************************************************************************************
+   *
+   * START: Getters
+   *
+   ********************************************************************************************************************/
+
   public int getId() {
     return this.id;
   }
@@ -213,15 +221,15 @@ public class Game {
     return this.player2;
   }
 
-  public static Player getActivePlayer(Game g) {
-    return g.getMoves().size() % 2 == 0
-      ? Game.getWhitePlayer(g)
-      : Game.getBlackPlayer(g);
+  public List<Move> getMoves() {
+    return this.moves;
   }
 
-  public static boolean isComplete(Game g) {
-    return g.getPlayer1() != null && g.getPlayer2() != null;
-  }
+  /*********************************************************************************************************************
+   *
+   * END: Getters
+   *
+   ********************************************************************************************************************/
 
   public boolean equals(Object o) {
     if (o instanceof Game) {
