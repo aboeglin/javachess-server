@@ -19,11 +19,15 @@ public class Pawn {
         p -> p.getColor() == piece.getColor(),
         __ -> false,
         F.pipe(
-          p -> new SimpleEntry<Integer, Integer>(
+          p -> new SimpleEntry<>(
             Position.computeXOffset(Piece.getX(p), Piece.getX(piece)),
             Position.computeYOffset(Piece.getY(p), Piece.getY(piece))
           ),
-          o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1
+          F.ifElse(
+            __ -> piece.getColor() == Color.WHITE,
+            o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1,
+            o -> Math.abs(o.getKey()) == 1 && o.getValue() == -1
+          )
         )
       )
     ).apply(target);

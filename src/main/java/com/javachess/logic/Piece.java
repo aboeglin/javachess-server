@@ -1,6 +1,7 @@
 package com.javachess.logic;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Piece {
   protected String x;
@@ -40,9 +41,17 @@ public class Piece {
   }
 
   public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece p) {
+    Optional<Piece> target = Game.getPieceAt(x, y, pieces);
+
+    if (target.isPresent() && target.get().getColor() == p.getColor()) {
+      return false;
+    }
+
     switch (p.type) {
       case PAWN:
         return Pawn.canMoveTo(x, y, pieces, p);
+      case KNIGHT:
+        return Knight.canMoveTo(x, y, pieces, p);
       default:
         return false;
     }

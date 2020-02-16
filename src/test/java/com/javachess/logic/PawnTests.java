@@ -58,13 +58,24 @@ class PawnTests {
 
   @Test
   @DisplayName("canMoveTo should return true if a white piece moves one step in diagonal and a black piece is there")
-  public void canMoveToPieceDiagonal() {
+  public void canMoveToWhitePieceDiagonal() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("e", "7"), Position.of("e", "3")), g);
     g = Game.doMove(Move.of(Position.of("c", "7"), Position.of("c", "3")), g);
     Piece pawn = Game.getPieceAt("d", "2", g).get();
     assertEquals(true, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
     assertEquals(true, Pawn.canMoveTo("c", "3", Game.getPieces(g), pawn));
+  }
+
+  @Test
+  @DisplayName("canMoveTo should return true if a black piece moves one step in diagonal and a white piece is there")
+  public void canMoveToBlackPieceDiagonal() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    g = Game.doMove(Move.of(Position.of("e", "2"), Position.of("e", "6")), g);
+    g = Game.doMove(Move.of(Position.of("c", "2"), Position.of("c", "6")), g);
+    Piece pawn = Game.getPieceAt("d", "7", g).get();
+    assertEquals(true, Pawn.canMoveTo("e", "6", Game.getPieces(g), pawn));
+    assertEquals(true, Pawn.canMoveTo("c", "6", Game.getPieces(g), pawn));
   }
 
   @Test
