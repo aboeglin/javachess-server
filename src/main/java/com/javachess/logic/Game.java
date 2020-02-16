@@ -22,20 +22,8 @@ public class Game {
   private static String[] ROWS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
   private static Position[] ALL_POSITIONS = Game.buildAllPositions(COLUMNS, ROWS);
 
-  private static Position[] buildAllPositions(String[] cols, String[] rows) {
-    return F.pipe(
-      F.map(
-        (String col) -> F.map(row -> Position.of(col, row), Arrays.stream(rows))
-      ),
-      x -> x.flatMap(a -> a),
-      s -> s.toArray(Position[]::new)
-    ).apply(Arrays.stream(cols));
-  }
-
   /*********************************************************************************************************************
-   *
    * START: Constructors
-   *
    ********************************************************************************************************************/
 
   private Game(int id) {
@@ -80,9 +68,7 @@ public class Game {
   }
 
   /*********************************************************************************************************************
-   *
    * END: Constructors
-   *
    ********************************************************************************************************************/
 
   private static Player getWhitePlayer(Game g) {
@@ -186,12 +172,16 @@ public class Game {
     ).apply(g.getMoves().stream());
   }
 
-//  public static Board doMoveIfPossible(Move move, Board b) {
-//    if (POSSIBLE) {
-//      return doMove(move, b);
-//    }
-//    return b;
-//  }
+  public static Game doMoveIfPossible(Move move, Game g) {
+    Player activePlayer = Game.getActivePlayer(g);
+    Optional<Piece> pieceToMove = Game.getPieceAt(move.getFrom().getX(), move.getFrom().getY(), g);
+
+    return pieceToMove.isPresent()
+      && pieceToMove.get().getColor() == activePlayer.getColor()
+      && Piece.canMoveTo(move.getTo().getX(), move.getTo().getY(), Game.getPieces(g), pieceToMove.get())
+        ? doMove(move, g)
+        : g;
+  }
 
   public static Player getActivePlayer(Game g) {
     return g.getMoves().size() % 2 == 0
@@ -204,9 +194,7 @@ public class Game {
   }
 
   /*********************************************************************************************************************
-   *
    * START: Getters
-   *
    ********************************************************************************************************************/
 
   public int getId() {
@@ -226,9 +214,7 @@ public class Game {
   }
 
   /*********************************************************************************************************************
-   *
    * END: Getters
-   *
    ********************************************************************************************************************/
 
   public boolean equals(Object o) {
@@ -250,10 +236,18 @@ public class Game {
   }
 
   /*********************************************************************************************************************
-   *
    * START: Board generation part
-   *
    ********************************************************************************************************************/
+
+  private static Position[] buildAllPositions(String[] cols, String[] rows) {
+    return F.pipe(
+      F.map(
+        (String col) -> F.map(row -> Position.of(col, row), Arrays.stream(rows))
+      ),
+      x -> x.flatMap(a -> a),
+      s -> s.toArray(Position[]::new)
+    ).apply(Arrays.stream(cols));
+  }
 
   public static List<Piece> getInitialPieces() {
     return F.pipe(
@@ -324,8 +318,6 @@ public class Game {
   }
 
   /*********************************************************************************************************************
-   *
    * END: Board generation part
-   *
    ********************************************************************************************************************/
 }

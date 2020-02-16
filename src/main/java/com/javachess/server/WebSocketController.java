@@ -106,6 +106,7 @@ public class WebSocketController {
       if (movingPiece.isPresent()) {
         if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(game), movingPiece.get())) {
           Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
+
           GameMessage gm = new GameMessage(
             newGame.getId(),
             newGame.getPlayer1(),
@@ -113,7 +114,15 @@ public class WebSocketController {
             Game.getActivePlayer(newGame),
             Game.getPieces(newGame)
           );
-          response = new GameState("UPDATE", gm);
+
+          // If it's the same reference, that means that the game was not updated and therefore
+          // that the move was not allowed for some reason.
+          if (newGame == game) {
+            response = new GameState("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+          }
+          else {
+            response = new GameState("UPDATE", gm);
+          }
         }
         else {
           // Piece can't move there

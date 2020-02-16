@@ -146,6 +146,34 @@ public class GameTests {
   }
 
   @Test
+  @DisplayName("doMoveIfPossible should move a white pawn in a new game from b2 to b3")
+  public void doMoveIfPossibleb2b3() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    Game result = Game.doMoveIfPossible(Move.of(Position.of("b", "2"), Position.of("b", "3")), g);
+    Piece movedPiece = Game.getPieceAt("b", "3", result).get();
+    assertEquals(Piece.of("b", "3", Color.WHITE, PieceType.PAWN), movedPiece);
+  }
+
+  // Because it's not its turn
+  @Test
+  @DisplayName("doMoveIfPossible should not move a black pawn in a new game from b7 to b5")
+  public void doMoveIfPossibleb7b5() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    Game result = Game.doMoveIfPossible(Move.of(Position.of("b", "7"), Position.of("b", "5")), g);
+    boolean isPresent = Game.getPieceAt("b", "5", result).isPresent();
+    assertEquals(false, isPresent);
+  }
+
+  @Test
+  @DisplayName("doMoveIfPossible should not move a white pawn in a new game from b2 to b5")
+  public void doMoveIfPossibleb2b5() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    Game result = Game.doMoveIfPossible(Move.of(Position.of("b", "2"), Position.of("b", "5")), g);
+    boolean isPresent = Game.getPieceAt("b", "5", result).isPresent();
+    assertEquals(false, isPresent);
+  }
+
+  @Test
   @DisplayName("getPossibleMoves should return a list of possible moves")
   public void getPossibleMoves() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));

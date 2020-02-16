@@ -68,7 +68,7 @@ public class GameOrchestrator {
   }
 
   public Game performMove(String fromX, String fromY, String toX, String toY, Game game) {
-    Game newGame = Game.doMove(Move.of(Position.of(fromX, fromY), Position.of(toX, toY)), game);
+    Game newGame = Game.doMoveIfPossible(Move.of(Position.of(fromX, fromY), Position.of(toX, toY)), game);
 
     this.games = F.replace(
       (Game g) -> g.getId() == newGame.getId(),
