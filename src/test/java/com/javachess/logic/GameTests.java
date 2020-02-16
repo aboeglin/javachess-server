@@ -10,14 +10,14 @@ public class GameTests {
   @DisplayName("When creating a new game without player isComplete should be false")
   public void initialGameNotComplete() {
     Game game = Game.of(1);
-    assertEquals(false, game.isComplete());
+    assertEquals(false, Game.isComplete(game));
   }
 
   @Test
   @DisplayName("When creating a new game with 2 players isComplete should be true")
   public void initialGameComplete() {
     Game game = Game.of(1, Player.of("John"), Player.of("Jess"));
-    assertEquals(true, game.isComplete());
+    assertEquals(true, Game.isComplete(game));
   }
 
   @Test
@@ -56,5 +56,14 @@ public class GameTests {
     Game game3 = Game.of(1, Player.of("John"), null);
     Game game4 = Game.of(1, Player.of("John"), null);
     assertEquals(true, game3.equals(game4));
+  }
+
+  @Test
+  @DisplayName("doMove should return a new game with the piece at the new position")
+  public void doMove() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    Game result = Game.doMove(Move.of(Position.of("b", "7"), Position.of("b", "3")), g);
+    Piece movedPiece = Game.getPieceAt("b", "3", result).get();
+    assertEquals(Piece.of("b", "3", Color.BLACK, PieceType.PAWN), movedPiece);
   }
 }

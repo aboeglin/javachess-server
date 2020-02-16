@@ -61,7 +61,7 @@ public class WebSocketController {
         g.getPlayer1(),
         g.getPlayer2(),
         g.getActivePlayer(),
-        Board.getPieces(g.getBoard())
+        Game.getPieces(g)
       );
       GameState gs = new GameState("READY", gm);
       return gson.toJson(gs, GameState.class);
@@ -80,7 +80,7 @@ public class WebSocketController {
     Game g = orchestrator.findGameById(id);
 
     if (g != null) {
-      Position[] moves = Board.getPossibleMoves(input.getX(), input.getY(), Board.getPieces(g.getBoard()));
+      Position[] moves = Board.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
       PossibleMoves response = new PossibleMoves(moves);
       return gson.toJson(response, PossibleMoves.class);
     }
@@ -101,17 +101,17 @@ public class WebSocketController {
     GameState response = null;
 
     if (game != null) {
-      Optional<Piece> movingPiece = Board.getPieceAt(input.getFromX(), input.getFromY(), Board.getPieces(game.getBoard()));
+      Optional<Piece> movingPiece = Game.getPieceAt(input.getFromX(), input.getFromY(), game);
 
       if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(input.getToX(), input.getToY(), Board.getPieces(game.getBoard()), movingPiece.get())) {
+        if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(game), movingPiece.get())) {
           Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
           GameMessage gm = new GameMessage(
             newGame.getId(),
             newGame.getPlayer1(),
             newGame.getPlayer2(),
             newGame.getActivePlayer(),
-            Board.getPieces(newGame.getBoard())
+            Game.getPieces(newGame)
           );
           response = new GameState("UPDATE", gm);
         }
@@ -122,7 +122,7 @@ public class WebSocketController {
             game.getPlayer1(),
             game.getPlayer2(),
             game.getActivePlayer(),
-            Board.getPieces(game.getBoard())
+            Game.getPieces(game)
           );
           response = new GameState("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
         }

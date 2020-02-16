@@ -31,7 +31,7 @@ public class GameOrchestrator {
       ? this.games.get(this.games.size() - 1)
       : null;
 
-    if (lastGame == null || lastGame.isComplete()) {
+    if (lastGame == null || Game.isComplete(lastGame)) {
       latestGameId = latestGameId + 1;
       Game newGame = F.pipe(
         (Integer id) -> Game.of(id),
@@ -68,15 +68,7 @@ public class GameOrchestrator {
   }
 
   public Game performMove(String fromX, String fromY, String toX, String toY, Game game) {
-    Board afterMove = Board.doMove(Move.of(Position.of(fromX, fromY), Position.of(toX, toY)), game.getBoard());
-
-    Game newGame = Game.of(
-      game.getId(),
-      game.getPlayer1(),
-      game.getPlayer2(),
-      afterMove,
-      Game.getOpponent(game.getActivePlayer(), game)
-    );
+    Game newGame = Game.doMove(Move.of(Position.of(fromX, fromY), Position.of(toX, toY)), game);
 
     this.games = F.replace(
       (Game g) -> g.getId() == newGame.getId(),

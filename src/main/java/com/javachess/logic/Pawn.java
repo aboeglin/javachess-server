@@ -47,7 +47,7 @@ public class Pawn {
 
   public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece p) {
     return F.pipe(
-      Board.getPieceAt(x, y),
+      Game.getPieceAt(x, y),
       F.ifElse(
         Optional::isPresent,
         target -> Pawn.isValidDiagonalMove(target, p), // Check if position is in diagonal and is enemy ( Feind )

@@ -43,54 +43,6 @@ public class Board {
     return this.moves;
   }
 
-  // Move to Game such that :
-  // public static Game doMove(Move move, Game g)
-  public static Board doMove(Move move, Board b) {
-    return F.pipe(
-      (Stream<Move> s) -> F.concat(s, Stream.of(move)),
-      m -> m.collect(Collectors.toList()),
-      Board::of
-      // b -> game.of(game..., b)
-    ).apply(b.getMoves().stream());
-  }
-
-//  public static Board doMoveIfPossible(Move move, Board b) {
-//    if (POSSIBLE) {
-//      return doMove(move, b);
-//    }
-//    return b;
-//  }
-
-  public static List<Piece> getPieces(Board b) {
-    List<Piece> pieces = Board.getInitialPieces();
-    for (Move m : b.getMoves()) {
-      pieces = applyMove(m, pieces);
-    }
-    return pieces;
-  }
-
-  public static List<Piece> applyMove(Move move, List<Piece> pieces) {
-    return F.pipe(
-      (Move m) -> Board.getPieceAt(m.getFrom().getX(), m.getFrom().getY(), pieces),
-      F.ifElse(
-        Optional::isPresent,
-        F.pipe(
-          Optional::get,
-          (Piece piece) -> F.pipe(
-            (Stream<Piece> p) -> Board.getPieceAt(move.getTo().getX(), move.getTo().getY(), p.collect(Collectors.toList())),
-            p -> F.reject(x -> p.isPresent() ? p.get().equals(x) : false, pieces.stream()),
-            F.replace(
-              x -> x.equals(piece),
-              Piece.moveTo(move.getTo().getX(), move.getTo().getY(), piece)
-            )
-          ).apply(pieces.stream()),
-          s -> s.collect(Collectors.toList())
-        ),
-        __ -> pieces // We return the initial Pieces if no piece was found
-      )
-    ).apply(move);
-  }
-
   private static Position[] buildAllPositions(String[] cols, String[] rows) {
     return F.pipe(
       F.map(
@@ -103,32 +55,19 @@ public class Board {
 
   public static Position[] getPossibleMoves(String x, String y, List<Piece> pieces) {
     return F.pipe(
-      Board.getPieceAt(x, y),
+      Game.getPieceAt(x, y),
       F.ifElse(
         Optional::isPresent,
         F.pipe(
           Optional::get,
           piece -> F.filter((Position p) ->
-            Piece.canMoveTo(p.getX(), p.getY(), pieces, piece) // should pass array of pieces instead of board for performance
+            Piece.canMoveTo(p.getX(), p.getY(), pieces, piece)
           ).apply(Arrays.stream(ALL_POSITIONS))
         ),
         __ -> Stream.empty()
       ),
       s -> s.toArray(Position[]::new)
     ).apply(pieces);
-  }
-
-  public static Optional<Piece> getPieceAt(String x, String y, List<Piece> pieces) {
-    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), pieces.stream());
-  }
-
-  @Curry
-  public static Function<List<Piece>, Optional<Piece>> getPieceAt(final String x, final String y) {
-    return p -> getPieceAt(x, y, p);
-  }
-
-  public static Optional<Piece> getPieceAt(String x, String y, Board b) {
-    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), Board.getPieces(b).stream());
   }
 
 

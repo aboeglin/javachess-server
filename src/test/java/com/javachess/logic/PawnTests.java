@@ -25,87 +25,87 @@ class PawnTests {
   @Test
   @DisplayName("canMoveTo should return true if a white pawn moves one step up and no piece is at that position")
   public void canMoveToWhiteOneStepUp() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(true, Pawn.canMoveTo("d", "3", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(true, Pawn.canMoveTo("d", "3", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a white pawn moves three steps up")
   public void canMoveToWhiteThreeStepsUp() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(false, Pawn.canMoveTo("d", "5", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a white pawn moves two steps up and it is not in its initial position anymore")
   public void canMoveToWhiteTwoStepsUpAfterInitialPosition() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), b);
-    Piece pawn = Board.getPieceAt("d", "3", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    g = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
+    Piece pawn = Game.getPieceAt("d", "3", g).get();
+    assertEquals(false, Pawn.canMoveTo("d", "5", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a piece is present at destination")
   public void canMoveToPieceAtDestination() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.doMove(Move.of(Position.of("d", "7"), Position.of("d", "4")), b);
-    Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    g = Game.doMove(Move.of(Position.of("d", "7"), Position.of("d", "4")), g);
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return true if a white piece moves one step in diagonal and a black piece is there")
   public void canMoveToPieceDiagonal() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.doMove(Move.of(Position.of("e", "7"), Position.of("e", "3")), b);
-    b = Board.doMove(Move.of(Position.of("c", "7"), Position.of("c", "3")), b);
-    Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(true, Pawn.canMoveTo("e", "3", Board.getPieces(b), pawn));
-    assertEquals(true, Pawn.canMoveTo("c", "3", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    g = Game.doMove(Move.of(Position.of("e", "7"), Position.of("e", "3")), g);
+    g = Game.doMove(Move.of(Position.of("c", "7"), Position.of("c", "3")), g);
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(true, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
+    assertEquals(true, Pawn.canMoveTo("c", "3", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a white piece moves one step in diagonal and a white piece is there")
   public void canMoveToPieceDiagonalSameColor() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.doMove(Move.of(Position.of("e", "2"), Position.of("e", "3")), b);
-    Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("e", "3", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    g = Game.doMove(Move.of(Position.of("e", "2"), Position.of("e", "3")), g);
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(false, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a white piece moves one step in diagonal and no piece is there")
   public void canMoveToPieceDiagonalEmptySquare() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    Piece pawn = Board.getPieceAt("d", "2", b).get();
-    assertEquals(false, Pawn.canMoveTo("e", "3", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(false, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return true if a black piece moves one step down")
   public void canMoveToPieceBlackDown() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    Piece pawn = Board.getPieceAt("d", "7", b).get();
-    assertEquals(true, Pawn.canMoveTo("d", "6", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    Piece pawn = Game.getPieceAt("d", "7", g).get();
+    assertEquals(true, Pawn.canMoveTo("d", "6", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a black pawn moves two steps down and it is not in its initial position anymore")
   public void canMoveToBlackTwoStepsDownAfterInitialPosition() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    b = Board.doMove(Move.of(Position.of("d", "7"), Position.of("d", "6")), b);
-    Piece pawn = Board.getPieceAt("d", "6", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    g = Game.doMove(Move.of(Position.of("d", "7"), Position.of("d", "6")), g);
+    Piece pawn = Game.getPieceAt("d", "6", g).get();
+    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 
   @Test
   @DisplayName("canMoveTo should return false if a black piece moves more than two steps down")
   public void canMoveToPieceBlack3Down() {
-    Board b = Board.create(); // Initial board, any pawn should be able to move one step up
-    Piece pawn = Board.getPieceAt("d", "7", b).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Board.getPieces(b), pawn));
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK), Board.of());
+    Piece pawn = Game.getPieceAt("d", "7", g).get();
+    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 }

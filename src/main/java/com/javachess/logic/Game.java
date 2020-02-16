@@ -1,14 +1,18 @@
 package com.javachess.logic;
 
 import com.javachess.util.fp.Curry;
+import com.javachess.util.fp.F;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Game {
   private int id;
   private Player player1;
   private Player player2;
-  private Player activePlayer;
   private Board board;
 
   private static final Board INITIAL_BOARD = Board.create();
@@ -38,14 +42,6 @@ public class Game {
     this.board = board;
   }
 
-  private Game(int id, Player player1, Player player2, Board board, Player activePlayer) {
-    this.id = id;
-    this.player1 = player1;
-    this.player2 = player2;
-    this.board = board;
-    this.activePlayer = activePlayer;
-  }
-
   public static Game of(int id) {
     return new Game(id);
   }
@@ -62,10 +58,6 @@ public class Game {
     return new Game(id, player1, player2, board);
   }
 
-  public static Game of(int id, Player player1, Player player2, Board board, Player activePlayer) {
-    return new Game(id, player1, player2, board, activePlayer);
-  }
-
   private static Color getRandomColor() {
     return Color.WHITE;
   }
@@ -76,6 +68,12 @@ public class Game {
 
   private static Player getWhitePlayer(Game g) {
     return g.getPlayer1().getColor() == Color.WHITE
+      ? g.getPlayer1()
+      : g.getPlayer2();
+  }
+
+  private static Player getBlackPlayer(Game g) {
+    return g.getPlayer1().getColor() == Color.BLACK
       ? g.getPlayer1()
       : g.getPlayer2();
   }
@@ -103,8 +101,7 @@ public class Game {
         fullGame.getId(),
         fullGame.getPlayer1(),
         fullGame.getPlayer2(),
-        fullGame.getBoard(),
-        getWhitePlayer(fullGame)
+        fullGame.getBoard()
       );
     }
   }
@@ -113,6 +110,68 @@ public class Game {
   public static Function<Game, Game> addPlayer(Player player) {
     return g -> Game.addPlayer(player, g);
   }
+
+  // Should be tested
+  public static List<Piece> getPieces(Game g) {
+    List<Piece> pieces = Board.getInitialPieces();
+    for (Move m : g.getBoard().getMoves()) {
+      pieces = Game.applyMove(m, pieces);
+    }
+    return pieces;
+  }
+
+  private static List<Piece> applyMove(Move move, List<Piece> pieces) {
+    return F.pipe(
+      (Move m) -> Game.getPieceAt(m.getFrom().getX(), m.getFrom().getY(), pieces),
+      F.ifElse(
+        Optional::isPresent,
+        F.pipe(
+          Optional::get,
+          (Piece piece) -> F.pipe(
+            (Stream<Piece> p) -> Game.getPieceAt(move.getTo().getX(), move.getTo().getY(), p.collect(Collectors.toList())),
+            p -> F.reject(x -> p.isPresent() ? p.get().equals(x) : false, pieces.stream()),
+            F.replace(
+              x -> x.equals(piece),
+              Piece.moveTo(move.getTo().getX(), move.getTo().getY(), piece)
+            )
+          ).apply(pieces.stream()),
+          s -> s.collect(Collectors.toList())
+        ),
+        __ -> pieces // We return the initial Pieces if no piece was found
+      )
+    ).apply(move);
+  }
+
+  public static Optional<Piece> getPieceAt(String x, String y, List<Piece> pieces) {
+    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), pieces.stream());
+  }
+
+  @Curry
+  public static Function<List<Piece>, Optional<Piece>> getPieceAt(final String x, final String y) {
+    return p -> getPieceAt(x, y, p);
+  }
+
+  public static Optional<Piece> getPieceAt(String x, String y, Game g) {
+    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), Game.getPieces(g).stream());
+  }
+
+  // Move to Game such that :
+  // public static Game doMove(Move move, Game g)
+  public static Game doMove(Move move, Game g) {
+    return F.pipe(
+      (Stream<Move> s) -> F.concat(s, Stream.of(move)),
+      m -> m.collect(Collectors.toList()),
+      Board::of,
+      b -> Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), b)
+    ).apply(g.getBoard().getMoves().stream());
+  }
+
+//  public static Board doMoveIfPossible(Move move, Board b) {
+//    if (POSSIBLE) {
+//      return doMove(move, b);
+//    }
+//    return b;
+//  }
 
   public int getId() {
     return this.id;
@@ -127,16 +186,17 @@ public class Game {
   }
 
   public Player getActivePlayer() {
-    return this.activePlayer;
+    return this.getBoard().getMoves().size() % 2 == 0
+      ? Game.getWhitePlayer(this)
+      : Game.getBlackPlayer(this);
   }
 
   public Board getBoard() {
     return board;
   }
 
-  // public static boolean isComplete(Game g) ?
-  public boolean isComplete() {
-    return this.player1 != null && this.player2 != null;
+  public static boolean isComplete(Game g) {
+    return g.getPlayer1() != null && g.getPlayer2() != null;
   }
 
   public boolean equals(Object o) {
