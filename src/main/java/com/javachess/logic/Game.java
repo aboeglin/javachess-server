@@ -3,6 +3,8 @@ package com.javachess.logic;
 import com.javachess.util.fp.Curry;
 import com.javachess.util.fp.F;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -10,36 +12,50 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Game {
+
   private int id;
   private Player player1;
   private Player player2;
-  private Board board;
+  private List<Move> moves;
 
-  private static final Board INITIAL_BOARD = Board.create();
+  private static String[] COLUMNS = new String[]{"a", "b", "c", "d", "e", "f", "g", "h"};
+  private static String[] ROWS = new String[]{"1", "2", "3", "4", "5", "6", "7", "8"};
+
+  private static Position[] ALL_POSITIONS = Game.buildAllPositions(COLUMNS, ROWS);
+
+  private static Position[] buildAllPositions(String[] cols, String[] rows) {
+    return F.pipe(
+      F.map(
+        (String col) -> F.map(row -> Position.of(col, row), Arrays.stream(rows))
+      ),
+      x -> x.flatMap(a -> a),
+      s -> s.toArray(Position[]::new)
+    ).apply(Arrays.stream(cols));
+  }
 
   private Game(int id) {
     this.id = id;
-    this.board = INITIAL_BOARD;
+    this.moves = new ArrayList<>();
   }
 
   private Game(int id, Player player1) {
     this.id = id;
     this.player1 = player1;
-    this.board = INITIAL_BOARD;
+    this.moves = new ArrayList<>();
   }
 
   private Game(int id, Player player1, Player player2) {
     this.id = id;
     this.player1 = player1;
     this.player2 = player2;
-    this.board = INITIAL_BOARD;
+    this.moves = new ArrayList<>();
   }
 
-  private Game(int id, Player player1, Player player2, Board board) {
+  private Game(int id, Player player1, Player player2, List<Move> moves) {
     this.id = id;
     this.player1 = player1;
     this.player2 = player2;
-    this.board = board;
+    this.moves = moves;
   }
 
   public static Game of(int id) {
@@ -54,8 +70,12 @@ public class Game {
     return new Game(id, player1, player2);
   }
 
-  public static Game of(int id, Player player1, Player player2, Board board) {
-    return new Game(id, player1, player2, board);
+  public static Game of(int id, Player player1, Player player2, List<Move> moves) {
+    return new Game(id, player1, player2, moves);
+  }
+
+  public List<Move> getMoves() {
+    return this.moves;
   }
 
   private static Color getRandomColor() {
@@ -78,12 +98,6 @@ public class Game {
       : g.getPlayer2();
   }
 
-  public static Player getOpponent(Player p, Game g) {
-    return g.getPlayer2().equals(p)
-      ? g.getPlayer1()
-      : g.getPlayer2();
-  }
-
   public static Game addPlayer(Player player, Game game) {
     if (game.getPlayer1() == null) {
       Player colorized = Player.of(player.getId(), getRandomColor());
@@ -101,7 +115,7 @@ public class Game {
         fullGame.getId(),
         fullGame.getPlayer1(),
         fullGame.getPlayer2(),
-        fullGame.getBoard()
+        fullGame.getMoves()
       );
     }
   }
@@ -113,8 +127,8 @@ public class Game {
 
   // Should be tested
   public static List<Piece> getPieces(Game g) {
-    List<Piece> pieces = Board.getInitialPieces();
-    for (Move m : g.getBoard().getMoves()) {
+    List<Piece> pieces = Game.getInitialPieces();
+    for (Move m : g.getMoves()) {
       pieces = Game.applyMove(m, pieces);
     }
     return pieces;
@@ -142,6 +156,23 @@ public class Game {
     ).apply(move);
   }
 
+  public static Position[] getPossibleMoves(String x, String y, List<Piece> pieces) {
+    return F.pipe(
+      Game.getPieceAt(x, y),
+      F.ifElse(
+        Optional::isPresent,
+        F.pipe(
+          Optional::get,
+          piece -> F.filter((Position p) ->
+            Piece.canMoveTo(p.getX(), p.getY(), pieces, piece)
+          ).apply(Arrays.stream(ALL_POSITIONS))
+        ),
+        __ -> Stream.empty()
+      ),
+      s -> s.toArray(Position[]::new)
+    ).apply(pieces);
+  }
+
   public static Optional<Piece> getPieceAt(String x, String y, List<Piece> pieces) {
     return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), pieces.stream());
   }
@@ -155,15 +186,12 @@ public class Game {
     return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), Game.getPieces(g).stream());
   }
 
-  // Move to Game such that :
-  // public static Game doMove(Move move, Game g)
   public static Game doMove(Move move, Game g) {
     return F.pipe(
       (Stream<Move> s) -> F.concat(s, Stream.of(move)),
       m -> m.collect(Collectors.toList()),
-      Board::of,
-      b -> Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), b)
-    ).apply(g.getBoard().getMoves().stream());
+      m -> Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), m)
+    ).apply(g.getMoves().stream());
   }
 
 //  public static Board doMoveIfPossible(Move move, Board b) {
@@ -185,14 +213,10 @@ public class Game {
     return this.player2;
   }
 
-  public Player getActivePlayer() {
-    return this.getBoard().getMoves().size() % 2 == 0
-      ? Game.getWhitePlayer(this)
-      : Game.getBlackPlayer(this);
-  }
-
-  public Board getBoard() {
-    return board;
+  public static Player getActivePlayer(Game g) {
+    return g.getMoves().size() % 2 == 0
+      ? Game.getWhitePlayer(g)
+      : Game.getBlackPlayer(g);
   }
 
   public static boolean isComplete(Game g) {
@@ -216,4 +240,84 @@ public class Game {
     }
     return false;
   }
+
+  /*********************************************************************************************************************
+   *
+   * START: Board generation part
+   *
+   ********************************************************************************************************************/
+
+  public static List<Piece> getInitialPieces() {
+    return F.pipe(
+      F.concat(generatePawns()),
+      F.concat(generateRooks()),
+      F.concat(generateBishops()),
+      F.concat(generateKnights()),
+      F.concat(generateQueens()),
+      F.concat(generateKings()),
+      s -> s.collect(Collectors.toList())
+    ).apply(Stream.of());
+  }
+
+  private static Function<Stream<String>, Stream<Piece>> colsToPawns(final Color c) {
+    return F.map(
+      x -> c == Color.WHITE
+        ? Piece.of(x, "2", Color.WHITE, PieceType.PAWN)
+        : Piece.of(x, "7", Color.BLACK, PieceType.PAWN)
+    );
+  }
+
+  private static Stream<Piece> generatePawns() {
+    return F.concat(
+      colsToPawns(Color.WHITE).apply(Arrays.stream(COLUMNS)),
+      colsToPawns(Color.BLACK).apply(Arrays.stream(COLUMNS))
+    );
+  }
+
+  private static Stream<Piece> generateRooks() {
+    return Stream.of(
+      Piece.of("a", "1", Color.WHITE, PieceType.ROOK),
+      Piece.of("h", "1", Color.WHITE, PieceType.ROOK),
+      Piece.of("a", "8", Color.BLACK, PieceType.ROOK),
+      Piece.of("h", "8", Color.BLACK, PieceType.ROOK)
+    );
+  }
+
+  private static Stream<Piece> generateBishops() {
+    return Stream.of(
+      Piece.of("c", "1", Color.WHITE, PieceType.BISHOP),
+      Piece.of("f", "1", Color.WHITE, PieceType.BISHOP),
+      Piece.of("c", "8", Color.BLACK, PieceType.BISHOP),
+      Piece.of("f", "8", Color.BLACK, PieceType.BISHOP)
+    );
+  }
+
+  private static Stream<Piece> generateKnights() {
+    return Stream.of(
+      Piece.of("b", "1", Color.WHITE, PieceType.KNIGHT),
+      Piece.of("g", "1", Color.WHITE, PieceType.KNIGHT),
+      Piece.of("b", "8", Color.BLACK, PieceType.KNIGHT),
+      Piece.of("g", "8", Color.BLACK, PieceType.KNIGHT)
+    );
+  }
+
+  private static Stream<Piece> generateQueens() {
+    return Stream.of(
+      Piece.of("d", "1", Color.WHITE, PieceType.QUEEN),
+      Piece.of("d", "8", Color.BLACK, PieceType.QUEEN)
+    );
+  }
+
+  private static Stream<Piece> generateKings() {
+    return Stream.of(
+      Piece.of("e", "1", Color.WHITE, PieceType.KING),
+      Piece.of("e", "8", Color.BLACK, PieceType.KING)
+    );
+  }
+
+  /*********************************************************************************************************************
+   *
+   * END: Board generation part
+   *
+   ********************************************************************************************************************/
 }

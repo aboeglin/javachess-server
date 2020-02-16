@@ -60,7 +60,7 @@ public class WebSocketController {
         g.getId(),
         g.getPlayer1(),
         g.getPlayer2(),
-        g.getActivePlayer(),
+        Game.getActivePlayer(g),
         Game.getPieces(g)
       );
       GameState gs = new GameState("READY", gm);
@@ -80,7 +80,7 @@ public class WebSocketController {
     Game g = orchestrator.findGameById(id);
 
     if (g != null) {
-      Position[] moves = Board.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
+      Position[] moves = Game.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
       PossibleMoves response = new PossibleMoves(moves);
       return gson.toJson(response, PossibleMoves.class);
     }
@@ -110,7 +110,7 @@ public class WebSocketController {
             newGame.getId(),
             newGame.getPlayer1(),
             newGame.getPlayer2(),
-            newGame.getActivePlayer(),
+            Game.getActivePlayer(newGame),
             Game.getPieces(newGame)
           );
           response = new GameState("UPDATE", gm);
@@ -121,7 +121,7 @@ public class WebSocketController {
             game.getId(),
             game.getPlayer1(),
             game.getPlayer2(),
-            game.getActivePlayer(),
+            Game.getActivePlayer(game),
             Game.getPieces(game)
           );
           response = new GameState("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
