@@ -36,7 +36,7 @@ public class GameOrchestrator {
       Game newGame = F.pipe(
         (Integer id) -> Game.of(id),
         Game.addPlayer(player),
-        F.sideEffect((Game g) -> games.add(g))
+        F.tap((Game g) -> games.add(g))
       ).apply(latestGameId);
       return newGame;
     }

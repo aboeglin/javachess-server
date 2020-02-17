@@ -1,11 +1,5 @@
 package com.javachess.util.fp;
 
-import com.javachess.logic.Game;
-import com.javachess.logic.Move;
-import com.javachess.logic.Piece;
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.*;
@@ -13,6 +7,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class F {
+
+  private F() {
+  }
 
   public static <A, B> Function<A, B> pipe(Function<A, B> f1) {
     return f1;
@@ -106,7 +103,7 @@ public class F {
   }
 
   @Curry
-  public static <T> Function<Stream<T>,Optional<T>> find(Predicate<T> p) {
+  public static <T> Function<Stream<T>, Optional<T>> find(Predicate<T> p) {
     return s -> s.filter(p).findFirst();
   }
 
@@ -158,26 +155,14 @@ public class F {
     return s -> replace(p, value, s);
   }
 
-  public static <T> Stream<T> peek(Consumer<? super T> action, Stream<T> s) {
-    return s.peek(action);
-  }
-
-  @Curry
-  public static <T> Function<Stream<T>, Stream<T>> peek(Consumer<? super T> action) {
-    return s -> s.peek(action);
-  }
-
-  public static <T> T sideEffect(Consumer<? super T> action, T s) {
+  public static <T> T tap(Consumer<? super T> action, T s) {
     action.accept(s);
     return s;
   }
 
   @Curry
-  public static <T> Function<T, T> sideEffect(Consumer<? super T> action) {
-    return s -> {
-      action.accept(s);
-      return s;
-    };
+  public static <T> Function<T, T> tap(Consumer<? super T> action) {
+    return s -> tap(action, s);
   }
 
   public static <T> T last(Stream<T> s1) {
