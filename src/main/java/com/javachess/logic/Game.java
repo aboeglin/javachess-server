@@ -184,9 +184,15 @@ public class Game {
   }
 
   public static Player getActivePlayer(Game g) {
-    return g.getMoves().size() % 2 == 0
-      ? Game.getWhitePlayer(g)
-      : Game.getBlackPlayer(g);
+    return F.ifElse(
+      Game::isWhitePlayerActive,
+      Game::getWhitePlayer,
+      Game::getBlackPlayer
+    ).apply(g);
+  }
+
+  public static boolean isWhitePlayerActive(Game g) {
+    return g.getMoves().size() % 2 == 0;
   }
 
   public static boolean isComplete(Game g) {
