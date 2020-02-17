@@ -148,7 +148,7 @@ public class Game {
   }
 
   public static Optional<Piece> getPieceAt(String x, String y, List<Piece> pieces) {
-    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), pieces.stream());
+    return F.find(p -> p.getX().equals(x) && p.getY().equals(y), pieces.stream());
   }
 
   @Curry
@@ -157,7 +157,7 @@ public class Game {
   }
 
   public static Optional<Piece> getPieceAt(String x, String y, Game g) {
-    return F.find(p -> Piece.getX(p).equals(x) && Piece.getY(p).equals(y), Game.getPieces(g).stream());
+    return F.find(p -> p.getX().equals(x) && p.getY().equals(y), Game.getPieces(g).stream());
   }
 
   public static Game doMove(Move move, Game g) {

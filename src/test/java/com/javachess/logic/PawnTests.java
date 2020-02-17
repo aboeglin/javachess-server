@@ -104,6 +104,15 @@ class PawnTests {
   }
 
   @Test
+  @DisplayName("canMoveTo should return false if there's a piece in front of it")
+  public void canMoveToPieceWhite2UpPieceInBetween() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    g = Game.doMove(Move.of(Position.of("d", "7"), Position.of("d", "3")), g);
+    Piece pawn = Game.getPieceAt("d", "2", g).get();
+    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
+  }
+
+  @Test
   @DisplayName("canMoveTo should return false if a black pawn moves two steps down and it is not in its initial position anymore")
   public void canMoveToBlackTwoStepsDownAfterInitialPosition() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));

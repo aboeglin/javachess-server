@@ -20,8 +20,8 @@ public class Pawn {
         __ -> false,
         F.pipe(
           p -> new SimpleEntry<>(
-            Position.computeXOffset(Piece.getX(p), Piece.getX(piece)),
-            Position.computeYOffset(Piece.getY(p), Piece.getY(piece))
+            Position.computeXOffset(p.getX(), piece.getX()),
+            Position.computeYOffset(p.getY(), piece.getY())
           ),
           F.ifElse(
             __ -> piece.getColor() == Color.WHITE,
@@ -33,18 +33,26 @@ public class Pawn {
     ).apply(target);
   }
 
-  private static boolean isValidStraightMove(String toX, String toY, Piece piece) {
+  private static boolean resolveStraightWhiteMove(Entry<Integer, Integer> offsets, boolean inBetween, Piece piece) {
+    return !inBetween && (offsets.getKey() == 0 && offsets.getValue() == 1
+      || offsets.getKey() == 0 && offsets.getValue() == 2 && piece.getY().equals("2"));
+  }
+
+  private static boolean isValidStraightMove(String toX, String toY, List<Piece> pieces, Piece piece) {
     return F.pipe(
       (Entry<String, String> to) -> new SimpleEntry<Integer, Integer>(
-        Position.computeXOffset(to.getKey(), Piece.getX(piece)),
-        Position.computeYOffset(to.getValue(), Piece.getY(piece))
+        Position.computeXOffset(to.getKey(), piece.getX()),
+        Position.computeYOffset(to.getValue(), piece.getY())
       ),
       F.ifElse(
         __ -> piece.getColor() == Color.WHITE,
-        offsets -> offsets.getKey() == 0 && offsets.getValue() == 1
-          || offsets.getKey() == 0 && offsets.getValue() == 2 && Piece.getY(piece).equals("2"),
+        offsets -> F.pipe(
+          Game.getPieceAt(piece.getX(), Position.yFromInt(Position.yAsInt(piece.getY()) + 1)),
+          Optional::isPresent,
+          inBetween -> resolveStraightWhiteMove(offsets, inBetween, piece)
+        ).apply(pieces),
         offsets -> offsets.getKey() == 0 && offsets.getValue() == -1
-          || offsets.getKey() == 0 && offsets.getValue() == -2 && Piece.getY(piece).equals("7")
+          || offsets.getKey() == 0 && offsets.getValue() == -2 && piece.getY().equals("7")
       )
     ).apply(new SimpleEntry<String, String>(toX, toY));
   }
@@ -55,7 +63,7 @@ public class Pawn {
       F.ifElse(
         Optional::isPresent,
         target -> Pawn.isValidDiagonalMove(target, p), // Check if position is in diagonal and is enemy ( Feind )
-        __ -> Pawn.isValidStraightMove(x, y, p)
+        __ -> Pawn.isValidStraightMove(x, y, pieces, p)
       )
     ).apply(pieces);
   }

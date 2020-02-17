@@ -70,6 +70,10 @@ public class Position {
     return Position.getXPositionsMap().get(x);
   }
 
+  public static String yFromInt(Integer y) {
+    return y.toString();
+  }
+
   public static int yAsInt(String y) {
     return Integer.parseInt(y);
   }

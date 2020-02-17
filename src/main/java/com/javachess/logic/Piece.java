@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class Piece {
-  protected String x;
-  protected String y;
-  protected Color color;
-  protected PieceType type;
+  private String x;
+  private String y;
+  private Color color;
+  private PieceType type;
 
   private Piece(String x, String y, Color c, PieceType t) {
     this.x = x;
@@ -20,12 +20,12 @@ public class Piece {
     return new Piece(x, y, c, t);
   }
 
-  public static String getX(Piece p) {
-    return p.x;
+  public String getX() {
+    return this.x;
   }
 
-  public static String getY(Piece p) {
-    return p.y;
+  public String getY() {
+    return this.y;
   }
 
   public Color getColor() {
