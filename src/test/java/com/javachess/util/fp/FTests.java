@@ -159,4 +159,12 @@ class FTests {
     assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
   }
 
+  @Test
+  public void reduce() {
+    Stream<Integer> s = Stream.of(1, 2, 3, 4);
+    Integer actual = F.reduce((acc, v) -> acc + v, 0, s);
+    Integer expected = 10;
+    assertEquals(expected, actual);
+  }
+
 }

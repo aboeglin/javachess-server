@@ -1,5 +1,9 @@
 package com.javachess.util.fp;
 
+import com.javachess.logic.Game;
+import com.javachess.logic.Move;
+import com.javachess.logic.Piece;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -179,6 +183,15 @@ public class F {
   public static <T> T last(Stream<T> s1) {
     List<T> l = s1.collect(Collectors.toList());
     return l.get(l.size() - 1);
+  }
+
+  public static <T, V> V reduce(BiFunction<V, T, V> reducer, V initialValue, Stream<T> s) {
+    List<T> values = s.collect(Collectors.toList());
+    V computed = initialValue;
+    for (T v : values) {
+      computed = reducer.apply(computed, v);
+    }
+    return computed;
   }
 }
 

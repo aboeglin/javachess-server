@@ -105,14 +105,10 @@ public class Game {
 
   // Should be tested
   public static List<Piece> getPieces(Game g) {
-    List<Piece> pieces = Game.getInitialPieces();
-    for (Move m : g.getMoves()) {
-      pieces = Game.applyMove(m, pieces);
-    }
-    return pieces;
+    return F.reduce(Game::applyMove, Game.getInitialPieces(), g.getMoves().stream());
   }
 
-  private static List<Piece> applyMove(Move move, List<Piece> pieces) {
+  private static List<Piece> applyMove(List<Piece> pieces, Move move) {
     return F.pipe(
       (Move m) -> Game.getPieceAt(m.getFrom().getX(), m.getFrom().getY(), pieces),
       F.ifElse(
