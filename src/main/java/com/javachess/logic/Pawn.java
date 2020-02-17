@@ -38,6 +38,11 @@ public class Pawn {
       || offsets.getKey() == 0 && offsets.getValue() == 2 && piece.getY().equals("2"));
   }
 
+  private static boolean resolveStraightBlackMove(Entry<Integer, Integer> offsets, boolean inBetween, Piece piece) {
+    return !inBetween && (offsets.getKey() == 0 && offsets.getValue() == -1
+      || offsets.getKey() == 0 && offsets.getValue() == -2 && piece.getY().equals("7"));
+  }
+
   private static boolean isValidStraightMove(String toX, String toY, List<Piece> pieces, Piece piece) {
     return F.pipe(
       (Entry<String, String> to) -> new SimpleEntry<Integer, Integer>(
@@ -51,8 +56,11 @@ public class Pawn {
           Optional::isPresent,
           inBetween -> resolveStraightWhiteMove(offsets, inBetween, piece)
         ).apply(pieces),
-        offsets -> offsets.getKey() == 0 && offsets.getValue() == -1
-          || offsets.getKey() == 0 && offsets.getValue() == -2 && piece.getY().equals("7")
+        offsets -> F.pipe(
+          Game.getPieceAt(piece.getX(), Position.yFromInt(Position.yAsInt(piece.getY()) - 1)),
+          Optional::isPresent,
+          inBetween -> resolveStraightBlackMove(offsets, inBetween, piece)
+        ).apply(pieces)
       )
     ).apply(new SimpleEntry<String, String>(toX, toY));
   }
