@@ -78,4 +78,13 @@ class BishopTests {
     List<Position> actual = Bishop.computeTrajectory(from, to);
     assertArrayEquals(expected.toArray(), actual.toArray());
   }
+
+  @Test
+  @DisplayName("canMoveTo should return true if there's no piece in between")
+  public void canMoveToNoInBetween() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    g = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
+    Piece bishop = Game.getPieceAt("c", "1", g).get();
+    assertEquals(true, Bishop.canMoveTo("h", "6", Game.getPieces(g), bishop));
+  }
 }

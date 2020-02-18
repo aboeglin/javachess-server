@@ -52,6 +52,8 @@ public class Piece {
         return Pawn.canMoveTo(x, y, pieces, p);
       case KNIGHT:
         return Knight.canMoveTo(x, y, pieces, p);
+      case BISHOP:
+        return Bishop.canMoveTo(x, y, pieces, p);
       default:
         return false;
     }

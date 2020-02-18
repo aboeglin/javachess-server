@@ -71,6 +71,7 @@ public class Position {
     return tuple.getKey() - tuple.getValue();
   }
 
+  // Make it take ints now that we have Position::getXAsInt and Position::getYAsInt ?
   private static int computeOffset(String a1, String a2, Function<String, Integer> asIntFn) {
     return F.pipe(
       mapTupleToIntSpace(asIntFn),

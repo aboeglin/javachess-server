@@ -32,4 +32,27 @@ public class Bishop {
       s -> s.collect(Collectors.toList())
     ).apply(range);
   }
+
+  private static int delta(int from, int to) {
+    return Math.abs(from - to);
+  }
+
+  public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece piece) {
+    Position from = Position.of(piece.getX(), piece.getY());
+    Position to = Position.of(x, y);
+    int deltaX = delta(to.getXAsInt(), from.getXAsInt());
+    int deltaY = delta(to.getYAsInt(), from.getYAsInt());
+
+    if (deltaX == deltaY) {
+      List<Position> squaresInBetween = Bishop.computeTrajectory(from, to);
+
+      return !F.reduce(
+        (Boolean inBetween, Position pos) ->
+          Game.getPieceAt(pos.getX(), pos.getY(), pieces).isPresent() || inBetween,
+        false,
+        squaresInBetween.stream()
+      );
+    }
+    return false;
+  }
 }
