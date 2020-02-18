@@ -1,13 +1,12 @@
 package com.javachess.logic;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class BishopTests {
 
@@ -86,5 +85,25 @@ class BishopTests {
     g = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
     Piece bishop = Game.getPieceAt("c", "1", g).get();
     assertEquals(true, Bishop.canMoveTo("h", "6", Game.getPieces(g), bishop));
+  }
+
+  @Test
+  @DisplayName("canMoveTo should not crash when given weird values ( non diagonal moves )")
+  public void canMoveToWeirdMove() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    final Game beforeMove = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
+    Piece bishop = Game.getPieceAt("c", "1", beforeMove).get();
+    assertDoesNotThrow(() -> {
+      Bishop.canMoveTo("a", "1", Game.getPieces(beforeMove), bishop);
+    });
+  }
+
+  @Test
+  @DisplayName("canMoveTo should not return false when given weird values ( non diagonal moves )")
+  public void canMoveToWeirdMoveFalse() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    final Game beforeMove = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
+    Piece bishop = Game.getPieceAt("c", "1", beforeMove).get();
+    assertEquals(false, Bishop.canMoveTo("a", "1", Game.getPieces(beforeMove), bishop));
   }
 }
