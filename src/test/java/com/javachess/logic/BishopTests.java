@@ -106,4 +106,12 @@ class BishopTests {
     Piece bishop = Game.getPieceAt("c", "1", beforeMove).get();
     assertEquals(false, Bishop.canMoveTo("a", "1", Game.getPieces(beforeMove), bishop));
   }
+
+  @Test
+  @DisplayName("canMoveTo should return false if there's a piece in between")
+  public void canMoveToInBetween() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
+    Piece bishop = Game.getPieceAt("c", "1", g).get();
+    assertEquals(false, Bishop.canMoveTo("h", "6", Game.getPieces(g), bishop));
+  }
 }

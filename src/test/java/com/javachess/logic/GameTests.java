@@ -185,4 +185,58 @@ public class GameTests {
     expected.add(Position.of("b", "4"));
     assertArrayEquals(expected.toArray(), result);
   }
+
+  @Test
+  @DisplayName("getPieces should not apply moves where there's no piece")
+  public void getPiecesNoPiece() {
+    List<Move> moves = new ArrayList<>();
+    moves.add(Move.of(Position.of("c", "4"), Position.of("e", "2")));
+    Game g = Game.of(1, Player.of("white"), Player.of("black"), moves);
+    assertArrayEquals(Game.getInitialPieces().toArray(), Game.getPieces(g).toArray());
+  }
+
+  @Test
+  @DisplayName("getPossibleMoves should return an empty array if no move was possible")
+  public void getPossibleMovesEmpty() {
+    Game g = Game.of(1, Player.of("black", Color.BLACK), Player.of("white", Color.WHITE));
+    Position[] expected = new Position[]{};
+    assertArrayEquals(expected, Game.getPossibleMoves("c", "1", Game.getPieces((g))));
+  }
+
+  @Test
+  @DisplayName("getPossibleMoves should return an empty array if there's no piece at that position")
+  public void getPossibleMovesNoPiece() {
+    Game g = Game.of(1, Player.of("black", Color.BLACK), Player.of("white", Color.WHITE));
+    Position[] expected = new Position[]{};
+    assertArrayEquals(expected, Game.getPossibleMoves("c", "4", Game.getPieces((g))));
+  }
+
+  @Test
+  @DisplayName("getActivePlayer should always give the white player on a fresh game")
+  public void getPossibleActivePlayer() {
+    Player expected = Player.of("white", Color.WHITE);
+    Game g1 = Game.of(1, Player.of("black", Color.BLACK), expected);
+    Game g2 = Game.of(1, expected, Player.of("black", Color.BLACK));
+    assertEquals(expected, Game.getActivePlayer(g1));
+    assertEquals(expected, Game.getActivePlayer(g2));
+  }
+
+  @Test
+  @DisplayName("getActivePlayer should always give the black player on the second turn")
+  public void getPossibleActivePlayer2nd() {
+    List<Move> moves = new ArrayList<>();
+    moves.add(Move.of(Position.of("c", "4"), Position.of("e", "2")));
+    Player expected = Player.of("black", Color.BLACK);
+    Game g1 = Game.of(1, Player.of("white", Color.WHITE), expected, moves);
+    Game g2 = Game.of(1, expected, Player.of("white", Color.WHITE), moves);
+    assertEquals(expected, Game.getActivePlayer(g1));
+    assertEquals(expected, Game.getActivePlayer(g2));
+  }
+
+  @Test
+  @DisplayName("equals should return false if it's tested against another Class")
+  public void equalsOtherClass() {
+    Game g = Game.of(1, Player.of("white", Color.WHITE));
+    assertEquals(false, g.equals(new String("false")));
+  }
 }
