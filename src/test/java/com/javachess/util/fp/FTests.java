@@ -159,4 +159,29 @@ class FTests {
     assertArrayEquals(expected.toArray(Integer[]::new), output.toArray(Integer[]::new));
   }
 
+  @Test
+  @DisplayName("tap should return the given value")
+  public void tapReturn() {
+    Integer expected = 3;
+    Integer actual = F.tap(x -> {}, expected);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  @DisplayName("tap should execute the given function and have access to the given value")
+  public void tapExec() {
+    Integer expected = 3;
+    Integer n = F.tap(actual -> {
+      assertEquals(expected, actual);
+    }, expected);
+  }
+
+  @Test
+  public void reduce() {
+    Stream<Integer> s = Stream.of(1, 2, 3, 4);
+    Integer actual = F.reduce((acc, v) -> acc + v, 0, s);
+    Integer expected = 10;
+    assertEquals(expected, actual);
+  }
+
 }

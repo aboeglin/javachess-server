@@ -1,6 +1,7 @@
 package com.javachess.logic;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 
@@ -18,40 +19,60 @@ public class Pawn {
         p -> p.getColor() == piece.getColor(),
         __ -> false,
         F.pipe(
-          p -> new SimpleEntry<Integer, Integer>(
-            Position.computeXOffset(Piece.getX(p), Piece.getX(piece)),
-            Position.computeYOffset(Piece.getY(p), Piece.getY(piece))
+          p -> new SimpleEntry<>(
+            Position.computeXOffset(p.getX(), piece.getX()),
+            Position.computeYOffset(p.getY(), piece.getY())
           ),
-          o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1
+          F.ifElse(
+            __ -> piece.getColor() == Color.WHITE,
+            o -> Math.abs(o.getKey()) == 1 && o.getValue() == 1,
+            o -> Math.abs(o.getKey()) == 1 && o.getValue() == -1
+          )
         )
       )
     ).apply(target);
   }
 
-  private static boolean isValidStraightMove(String toX, String toY, Piece piece) {
+  private static boolean resolveStraightWhiteMove(Entry<Integer, Integer> offsets, boolean inBetween, Piece piece) {
+    return !inBetween && (offsets.getKey() == 0 && offsets.getValue() == 1
+      || offsets.getKey() == 0 && offsets.getValue() == 2 && piece.getY().equals("2"));
+  }
+
+  private static boolean resolveStraightBlackMove(Entry<Integer, Integer> offsets, boolean inBetween, Piece piece) {
+    return !inBetween && (offsets.getKey() == 0 && offsets.getValue() == -1
+      || offsets.getKey() == 0 && offsets.getValue() == -2 && piece.getY().equals("7"));
+  }
+
+  private static boolean isValidStraightMove(String toX, String toY, List<Piece> pieces, Piece piece) {
     return F.pipe(
       (Entry<String, String> to) -> new SimpleEntry<Integer, Integer>(
-        Position.computeXOffset(to.getKey(), Piece.getX(piece)),
-        Position.computeYOffset(to.getValue(), Piece.getY(piece))
+        Position.computeXOffset(to.getKey(), piece.getX()),
+        Position.computeYOffset(to.getValue(), piece.getY())
       ),
       F.ifElse(
         __ -> piece.getColor() == Color.WHITE,
-        offsets -> offsets.getKey() == 0 && offsets.getValue() == 1
-          || offsets.getKey() == 0 && offsets.getValue() == 2 && Piece.getY(piece).equals("2"),
-        offsets -> offsets.getKey() == 0 && offsets.getValue() == -1
-          || offsets.getKey() == 0 && offsets.getValue() == -2 && Piece.getY(piece).equals("7")
+        offsets -> F.pipe(
+          Game.getPieceAt(piece.getX(), Position.yFromInt(Position.yAsInt(piece.getY()) + 1)),
+          Optional::isPresent,
+          inBetween -> resolveStraightWhiteMove(offsets, inBetween, piece)
+        ).apply(pieces),
+        offsets -> F.pipe(
+          Game.getPieceAt(piece.getX(), Position.yFromInt(Position.yAsInt(piece.getY()) - 1)),
+          Optional::isPresent,
+          inBetween -> resolveStraightBlackMove(offsets, inBetween, piece)
+        ).apply(pieces)
       )
     ).apply(new SimpleEntry<String, String>(toX, toY));
   }
 
-  public static boolean canMoveTo(String x, String y, Board board, Piece p) {
+  public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece p) {
     return F.pipe(
-      Board.getPieceAt(x, y),
+      Game.getPieceAt(x, y),
       F.ifElse(
-        Optional<Piece>::isPresent,
+        Optional::isPresent,
         target -> Pawn.isValidDiagonalMove(target, p), // Check if position is in diagonal and is enemy ( Feind )
-        __ -> Pawn.isValidStraightMove(x, y, p)
+        __ -> Pawn.isValidStraightMove(x, y, pieces, p)
       )
-    ).apply(board);
+    ).apply(pieces);
   }
 }

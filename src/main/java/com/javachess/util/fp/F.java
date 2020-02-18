@@ -1,15 +1,15 @@
 package com.javachess.util.fp;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class F {
+
+  private F() {
+  }
 
   public static <A, B> Function<A, B> pipe(Function<A, B> f1) {
     return f1;
@@ -103,7 +103,7 @@ public class F {
   }
 
   @Curry
-  public static <T> Function<Stream<T>,Optional<T>> find(Predicate<T> p) {
+  public static <T> Function<Stream<T>, Optional<T>> find(Predicate<T> p) {
     return s -> s.filter(p).findFirst();
   }
 
@@ -155,9 +155,28 @@ public class F {
     return s -> replace(p, value, s);
   }
 
+  public static <T> T tap(Consumer<? super T> action, T s) {
+    action.accept(s);
+    return s;
+  }
+
+  @Curry
+  public static <T> Function<T, T> tap(Consumer<? super T> action) {
+    return s -> tap(action, s);
+  }
+
   public static <T> T last(Stream<T> s1) {
     List<T> l = s1.collect(Collectors.toList());
     return l.get(l.size() - 1);
+  }
+
+  public static <T, V> V reduce(BiFunction<V, T, V> reducer, V initialValue, Stream<T> s) {
+    List<T> values = s.collect(Collectors.toList());
+    V computed = initialValue;
+    for (T v : values) {
+      computed = reducer.apply(computed, v);
+    }
+    return computed;
   }
 }
 

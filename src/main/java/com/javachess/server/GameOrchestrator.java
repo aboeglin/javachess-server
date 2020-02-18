@@ -1,14 +1,10 @@
 package com.javachess.server;
 
-import com.javachess.logic.Board;
-import com.javachess.logic.Game;
-import com.javachess.logic.Piece;
-import com.javachess.logic.Player;
+import com.javachess.logic.*;
 import com.javachess.util.fp.F;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GameOrchestrator {
@@ -26,16 +22,22 @@ public class GameOrchestrator {
 
   /**
    * TODO: Should we verify that the user is in a game already first ?
+   *
    * @param player
    * @return
    */
   public Game registerPlayer(Player player) {
-    Game lastGame = games.size() > 0 ? games.get(games.size() - 1) : null;
+    Game lastGame = this.games.size() > 0
+      ? this.games.get(this.games.size() - 1)
+      : null;
 
-    if (lastGame == null || lastGame.isComplete()) {
+    if (lastGame == null || Game.isComplete(lastGame)) {
       latestGameId = latestGameId + 1;
-      Game newGame = Game.of(latestGameId, player);
-      games.add(newGame);
+      Game newGame = F.pipe(
+        (Integer id) -> Game.of(id),
+        Game.addPlayer(player),
+        F.tap((Game g) -> games.add(g))
+      ).apply(latestGameId);
       return newGame;
     }
 
@@ -65,33 +67,16 @@ public class GameOrchestrator {
     ).apply(this.games);
   }
 
-  public Game performMove(String fromX, String fromY, String toX, String toY, int gameId) {
-    Game g = this.findGameById(gameId);
+  public Game performMove(String fromX, String fromY, String toX, String toY, Game game) {
+    Game newGame = Game.doMoveIfPossible(Move.of(Position.of(fromX, fromY), Position.of(toX, toY)), game);
 
-    if (g != null) {
-      Optional<Piece> movingPiece = Board.getPieceAt(fromX, fromY, g.getBoard());
+    this.games = F.replace(
+      (Game g) -> g.getId() == newGame.getId(),
+      newGame,
+      this.games.stream()
+    ).collect(Collectors.toList());
 
-      if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(toX, toY, g.getBoard(), movingPiece.get())) {
-          Board afterMove = Board.executeMove(
-            fromX, fromY,
-            toX, toY,
-            g.getBoard()
-          );
-
-          Game newGame = Game.of(g.getId(), g.getPlayer1(), g.getPlayer2(), afterMove);
-          games = F.replace(
-            (Game game) -> game.getId() == newGame.getId(),
-            newGame,
-            this.games.stream()
-          ).collect(Collectors.toList());
-
-          return newGame;
-        }
-      }
-      return g;
-    }
-    return null;
+    return newGame;
   }
 
   public boolean isGameReady(Game g) {

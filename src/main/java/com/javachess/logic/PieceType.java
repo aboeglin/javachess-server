@@ -1,6 +1,6 @@
 package com.javachess.logic;
 
-enum PieceType {
+public enum PieceType {
   PAWN,
   BISHOP,
   KNIGHT,

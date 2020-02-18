@@ -1,10 +1,13 @@
 package com.javachess.logic;
 
+import java.util.List;
+import java.util.Optional;
+
 public class Piece {
-  protected String x;
-  protected String y;
-  protected Color color;
-  protected PieceType type;
+  private String x;
+  private String y;
+  private Color color;
+  private PieceType type;
 
   private Piece(String x, String y, Color c, PieceType t) {
     this.x = x;
@@ -17,12 +20,12 @@ public class Piece {
     return new Piece(x, y, c, t);
   }
 
-  public static String getX(Piece p) {
-    return p.x;
+  public String getX() {
+    return this.x;
   }
 
-  public static String getY(Piece p) {
-    return p.y;
+  public String getY() {
+    return this.y;
   }
 
   public Color getColor() {
@@ -37,10 +40,20 @@ public class Piece {
     return Piece.of(x, y, p.getColor(), p.getType());
   }
 
-  public static boolean canMoveTo(String x, String y, Board b, Piece p) {
+  public static boolean canMoveTo(String x, String y, List<Piece> pieces, Piece p) {
+    Optional<Piece> target = Game.getPieceAt(x, y, pieces);
+
+    if (target.isPresent() && target.get().getColor() == p.getColor()) {
+      return false;
+    }
+
     switch (p.type) {
       case PAWN:
-        return Pawn.canMoveTo(x, y, b, p);
+        return Pawn.canMoveTo(x, y, pieces, p);
+      case KNIGHT:
+        return Knight.canMoveTo(x, y, pieces, p);
+      case BISHOP:
+        return Bishop.canMoveTo(x, y, pieces, p);
       default:
         return false;
     }
