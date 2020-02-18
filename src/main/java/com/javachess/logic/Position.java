@@ -18,8 +18,20 @@ public class Position {
     this.y = y;
   }
 
+  private Position(Integer x, Integer y) {
+    this.x = "";
+    this.y = "";
+  }
+
   public static Position of(String x, String y) {
     return new Position(x, y);
+  }
+
+  public static Position of(Integer x, Integer y) {
+    String[] xs = (String[]) Position.getXPositionsMap().keySet().toArray(new String[]{});
+    String xStr = xs[x - 1];
+    String yStr = y.toString();
+    return new Position(xStr, yStr);
   }
 
   public boolean equals(Object o) {
@@ -70,12 +82,20 @@ public class Position {
     return Position.getXPositionsMap().get(x);
   }
 
+  public static int yAsInt(String y) {
+    return Integer.parseInt(y);
+  }
+
   public static String yFromInt(Integer y) {
     return y.toString();
   }
 
-  public static int yAsInt(String y) {
-    return Integer.parseInt(y);
+  public int getYAsInt() {
+    return Integer.parseInt(this.getY());
+  }
+
+  public int getXAsInt() {
+    return Position.getXPositionsMap().get(this.getX());
   }
 
   public String getX() {
