@@ -11,7 +11,7 @@ class KnightTests {
   public void canMoveToTwoUpOneRight() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece knight = Game.getPieceAt("b", "1", g).get();
-    assertEquals(true, Knight.canMoveTo("c", "3", Game.getPieces(g), knight));
+    assertEquals(true, Piece.canMoveTo("c", "3", Game.getPieces(g), knight));
   }
 
   @Test
@@ -20,6 +20,6 @@ class KnightTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("b", "1"), Position.of("c", "3")), g);
     Piece knight = Game.getPieceAt("c", "3", g).get();
-    assertEquals(true, Knight.canMoveTo("e", "4", Game.getPieces(g), knight));
+    assertEquals(true, Piece.canMoveTo("e", "4", Game.getPieces(g), knight));
   }
 }

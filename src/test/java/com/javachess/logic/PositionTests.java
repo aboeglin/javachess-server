@@ -37,4 +37,11 @@ public class PositionTests {
     assertEquals("a", p.getX());
     assertEquals("2", p.getY());
   }
+
+  @Test
+  @DisplayName("equals should return false if it's tested against another Class")
+  public void equalsOtherClass() {
+    Position p = Position.of("a", "2");
+    assertEquals(false, p.equals(new String("false")));
+  }
 }

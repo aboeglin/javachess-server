@@ -13,4 +13,11 @@ public class PieceTests {
     Piece knight = Game.getPieceAt("b", "1", g).get();
     assertEquals(false, Piece.canMoveTo("d", "2", Game.getPieces(g), knight));
   }
+
+  @Test
+  @DisplayName("equals should return false if it's tested against another Class")
+  public void equalsOtherClass() {
+    Piece p = Piece.of("a", "2", Color.BLACK, PieceType.KNIGHT);
+    assertEquals(false, p.equals(new String("false")));
+  }
 }

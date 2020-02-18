@@ -19,8 +19,9 @@ public class Position {
   }
 
   private Position(Integer x, Integer y) {
-    this.x = "";
-    this.y = "";
+    String[] xs = (String[]) Position.getXPositionsMap().keySet().toArray(new String[]{});
+    this.x = xs[x - 1];
+    this.y = y.toString();
   }
 
   public static Position of(String x, String y) {
@@ -28,10 +29,7 @@ public class Position {
   }
 
   public static Position of(Integer x, Integer y) {
-    String[] xs = (String[]) Position.getXPositionsMap().keySet().toArray(new String[]{});
-    String xStr = xs[x - 1];
-    String yStr = y.toString();
-    return new Position(xStr, yStr);
+    return new Position(x, y);
   }
 
   public boolean equals(Object o) {
