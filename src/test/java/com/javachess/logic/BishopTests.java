@@ -84,7 +84,7 @@ class BishopTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
     Piece bishop = Game.getPieceAt("c", "1", g).get();
-    assertEquals(true, Bishop.canMoveTo("h", "6", Game.getPieces(g), bishop));
+    assertEquals(true, Piece.canMoveTo("h", "6", Game.getPieces(g), bishop));
   }
 
   @Test
@@ -104,7 +104,7 @@ class BishopTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     final Game beforeMove = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
     Piece bishop = Game.getPieceAt("c", "1", beforeMove).get();
-    assertEquals(false, Bishop.canMoveTo("a", "1", Game.getPieces(beforeMove), bishop));
+    assertEquals(false, Piece.canMoveTo("a", "1", Game.getPieces(beforeMove), bishop));
   }
 
   @Test
@@ -112,6 +112,6 @@ class BishopTests {
   public void canMoveToInBetween() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece bishop = Game.getPieceAt("c", "1", g).get();
-    assertEquals(false, Bishop.canMoveTo("h", "6", Game.getPieces(g), bishop));
+    assertEquals(false, Piece.canMoveTo("h", "6", Game.getPieces(g), bishop));
   }
 }
