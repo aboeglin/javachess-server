@@ -27,7 +27,7 @@ class PawnTests {
   public void canMoveToWhiteOneStepUp() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(true, Pawn.canMoveTo("d", "3", Game.getPieces(g), pawn));
+    assertEquals(true, Piece.canMoveTo("d", "3", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -35,7 +35,7 @@ class PawnTests {
   public void canMoveToWhiteThreeStepsUp() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "5", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -44,7 +44,7 @@ class PawnTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "3")), g);
     Piece pawn = Game.getPieceAt("d", "3", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "5", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -53,7 +53,7 @@ class PawnTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("d", "7"), Position.of("d", "4")), g);
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -63,8 +63,8 @@ class PawnTests {
     g = Game.doMove(Move.of(Position.of("e", "7"), Position.of("e", "3")), g);
     g = Game.doMove(Move.of(Position.of("c", "7"), Position.of("c", "3")), g);
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(true, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
-    assertEquals(true, Pawn.canMoveTo("c", "3", Game.getPieces(g), pawn));
+    assertEquals(true, Piece.canMoveTo("e", "3", Game.getPieces(g), pawn));
+    assertEquals(true, Piece.canMoveTo("c", "3", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -74,8 +74,8 @@ class PawnTests {
     g = Game.doMove(Move.of(Position.of("e", "2"), Position.of("e", "6")), g);
     g = Game.doMove(Move.of(Position.of("c", "2"), Position.of("c", "6")), g);
     Piece pawn = Game.getPieceAt("d", "7", g).get();
-    assertEquals(true, Pawn.canMoveTo("e", "6", Game.getPieces(g), pawn));
-    assertEquals(true, Pawn.canMoveTo("c", "6", Game.getPieces(g), pawn));
+    assertEquals(true, Piece.canMoveTo("e", "6", Game.getPieces(g), pawn));
+    assertEquals(true, Piece.canMoveTo("c", "6", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -84,7 +84,7 @@ class PawnTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("e", "2"), Position.of("e", "3")), g);
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(false, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("e", "3", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -92,7 +92,7 @@ class PawnTests {
   public void canMoveToPieceDiagonalEmptySquare() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(false, Pawn.canMoveTo("e", "3", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("e", "3", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -100,7 +100,7 @@ class PawnTests {
   public void canMoveToPieceBlackDown() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece pawn = Game.getPieceAt("d", "7", g).get();
-    assertEquals(true, Pawn.canMoveTo("d", "6", Game.getPieces(g), pawn));
+    assertEquals(true, Piece.canMoveTo("d", "6", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -109,7 +109,7 @@ class PawnTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("d", "7"), Position.of("d", "3")), g);
     Piece pawn = Game.getPieceAt("d", "2", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -118,7 +118,7 @@ class PawnTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("d", "2"), Position.of("d", "6")), g);
     Piece pawn = Game.getPieceAt("d", "7", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "5", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "5", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -127,7 +127,7 @@ class PawnTests {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     g = Game.doMove(Move.of(Position.of("d", "7"), Position.of("d", "6")), g);
     Piece pawn = Game.getPieceAt("d", "6", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 
   @Test
@@ -135,6 +135,6 @@ class PawnTests {
   public void canMoveToPieceBlack3Down() {
     Game g = Game.of(1, Player.of("white", Color.WHITE), Player.of("black", Color.BLACK));
     Piece pawn = Game.getPieceAt("d", "7", g).get();
-    assertEquals(false, Pawn.canMoveTo("d", "4", Game.getPieces(g), pawn));
+    assertEquals(false, Piece.canMoveTo("d", "4", Game.getPieces(g), pawn));
   }
 }
