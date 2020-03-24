@@ -26,7 +26,7 @@ jobs:
           name: arnaudboeglin/javachess-server
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: "release-${{ github.run_number }}"
+          tags: "release-${{ github.run_number }},latest"
 
   report:
     runs-on: ubuntu-latest
