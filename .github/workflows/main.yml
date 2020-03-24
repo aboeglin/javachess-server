@@ -15,10 +15,10 @@ jobs:
       - name: Build with Maven
         run: mvn -B test --file pom.xml
       - name: Check base_ref
-        run: echo "$GITHUB_REF"
+        run: echo "$env.GITHUB_REF"
 
   build:
-    if: GITHUB_REF == 'refs/heads/master'
+    if: env.GITHUB_REF == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
