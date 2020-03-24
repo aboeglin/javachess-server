@@ -15,7 +15,9 @@ jobs:
       - name: Build with Maven
         run: mvn -B test --file pom.xml
       - name: Check base_ref
-        run: echo ${{ github.event.base_ref }}
+        env:
+          BASE_REF: ${{ github.event.base_ref }}
+        run: echo "BASE_REF"
 
   build:
     if: github.event.base_ref == 'refs/heads/master'
