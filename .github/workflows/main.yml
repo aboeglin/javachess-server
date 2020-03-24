@@ -16,11 +16,11 @@ jobs:
         run: mvn -B test --file pom.xml
       - name: Check base_ref
         env:
-          BASE_REF: ${{ github.event.base_ref }}
+          BASE_REF: ${{ github.base_ref }}
         run: echo "$BASE_REF"
 
   build:
-    if: github.event.base_ref == 'refs/heads/master'
+    if: github.base_ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
