@@ -17,7 +17,7 @@ jobs:
       - name: Check base_ref
         env:
           BASE_REF: ${{ github.event.base_ref }}
-        run: echo "BASE_REF"
+        run: echo "$BASE_REF"
 
   build:
     if: github.event.base_ref == 'refs/heads/master'
