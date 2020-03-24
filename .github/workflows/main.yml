@@ -14,6 +14,8 @@ jobs:
           java-version: 13
       - name: Build with Maven
         run: mvn -B test --file pom.xml
+      - name: Check
+        run: echo ${{ github.event.base_ref }}
 
   build:
     if: github.event.base_ref == 'refs/heads/master'
