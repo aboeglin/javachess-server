@@ -5,7 +5,6 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 13
@@ -17,6 +16,7 @@ jobs:
 
   build:
     if: github.ref == 'refs/heads/master'
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,8 +29,8 @@ jobs:
           tags: "release-${{ github.run_number }},latest"
 
   report:
+    needs: test
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
