@@ -2,11 +2,13 @@ package com.javachess.server;
 
 import com.javachess.logic.*;
 import com.javachess.util.fp.F;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component("gameOrchestrator")
 public class GameOrchestrator {
 
   private List<Game> games;
