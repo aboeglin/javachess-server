@@ -28,6 +28,26 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: "release-${{ github.run_number }},latest"
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Pull image
+        uses: appleboy/ssh-action@master
+        with:
+          host: easychess.xyz
+          username: root
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: docker pull arnaudboeglin/javachess-server:latest
+      - name: Update service
+        uses: appleboy/ssh-action@master
+        with:
+          host: easychess.xyz
+          username: root
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: cd /opt && docker-compose up -d
+
   report:
     needs: test
     runs-on: ubuntu-latest
