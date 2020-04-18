@@ -1,5 +1,6 @@
 package com.javachess.server;
 
+import com.javachess.logic.Game;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,12 @@ public class RestController {
   @ResponseBody
   public ResponseEntity health() {
     return new ResponseEntity(HttpStatus.NO_CONTENT);
+  }
+
+  @RequestMapping(value = "/games", method = RequestMethod.POST)
+  @ResponseBody
+  public ResponseEntity createGame() {
+    return new ResponseEntity(Game.of(1), HttpStatus.OK);
   }
 
 }
