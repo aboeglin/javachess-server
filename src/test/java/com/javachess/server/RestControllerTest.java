@@ -41,9 +41,8 @@ public class RestControllerTest {
 
     @Test
     public void createGame() {
-        // TODO: Instead of null, it should take the userId, and set it as player1 in the response.
-        String expected = "{\"id\":1,\"player1\":null,\"player2\":null,\"moves\":[]}";
-        assertThat(this.restTemplate.postForEntity("http://localhost:" + port + "/games", null,
+        String expected = "{\"id\":1,\"player1\":{\"id\":\"1\",\"color\":null},\"player2\":null,\"moves\":[]}";
+        assertThat(this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}",
           String.class).getBody()).isEqualTo(expected);
     }
 }
