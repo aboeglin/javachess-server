@@ -49,9 +49,21 @@ public class GameOrchestrator {
     return newGame;
   }
 
+  public Game createGame(Player player) {
+    latestGameId = latestGameId + 1;
+    Game newGame = F.pipe(
+      (Integer id) -> Game.of(id),
+      Game.addPlayer(player),
+      F.tap((Game g) -> games.add(g))
+    ).apply(latestGameId);
+    return newGame;
+  }
+
   public void join(Player player) {
     this.joinedPlayers.add(player);
   }
+
+  public List<Game> getGames() { return this.games; }
 
   public Game findGameByPlayer(Player p) {
     return F.pipe(
@@ -67,6 +79,15 @@ public class GameOrchestrator {
       F.find(g -> g.getId() == id),
       o -> o.orElse(null)
     ).apply(this.games);
+  }
+
+  public Game joinGameById(Player p, int id) {
+    // TODO: Verify that game is not already full
+    Game g = this.findGameById(id);
+    Game joined = Game.addPlayer(p, g);
+    this.games.remove(g);
+    this.games.add(joined);
+    return joined;
   }
 
   public Game performMove(String fromX, String fromY, String toX, String toY, Game game) {

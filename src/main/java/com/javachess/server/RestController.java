@@ -3,17 +3,17 @@ package com.javachess.server;
 import com.google.gson.Gson;
 import com.javachess.logic.Game;
 import com.javachess.logic.Player;
-import com.javachess.server.message.PerformMove;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class RestController {
+
+  @Autowired
+  private GameOrchestrator orchestrator;
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
   @ResponseBody
@@ -30,15 +30,30 @@ public class RestController {
   @RequestMapping(value = "/games", method = RequestMethod.POST)
   @ResponseBody
   public ResponseEntity createGame(@RequestBody String payload) {
-    // TODO: Register the created game to GameOrchestrator !
     Gson gson = new Gson();
-    CreateGameMessage input = gson.fromJson(payload, CreateGameMessage.class);
-    return new ResponseEntity(Game.of(1, Player.of(input.getUserId())), HttpStatus.OK);
+    UserMessage input = gson.fromJson(payload, UserMessage.class);
+    Player p = Player.of(input.getUserId());
+    Game response = this.orchestrator.createGame(p);
+    return new ResponseEntity(response, HttpStatus.OK);
   }
 
+  @RequestMapping(value = "/games", method = RequestMethod.GET)
+  @ResponseBody
+  public ResponseEntity listGames() {
+    return new ResponseEntity(this.orchestrator.getGames(), HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/games/{id}", method = RequestMethod.PATCH)
+  @ResponseBody
+  public ResponseEntity joinGame(@PathVariable(name = "id") int gameId, @RequestBody String payload) {
+    Gson gson = new Gson();
+    UserMessage input = gson.fromJson(payload, UserMessage.class);
+    Player p = Player.of(input.getUserId());
+    return new ResponseEntity(this.orchestrator.joinGameById(p, gameId), HttpStatus.OK);
+  }
 }
 
-class CreateGameMessage {
+class UserMessage {
   private String userId;
 
   public String getUserId() {

@@ -77,4 +77,15 @@ public class GameOrchestratorTests {
 
     assertEquals(true, orchestrator.isGameReady(game));
   }
+
+  @Test
+  @DisplayName("createGame should return a new game")
+  public void createGame() {
+    GameOrchestrator orchestrator = new GameOrchestrator();
+    Player player1 = Player.of("John");
+    Game expected = Game.of(1, player1);
+    Game received = orchestrator.createGame(player1);
+    assertEquals(expected, received);
+  }
+
 }
