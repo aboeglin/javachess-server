@@ -53,18 +53,15 @@ public class WebSocketController {
     // Should be find game by ID and that should fix the tests as we would then return game with id 2
     Game g = orchestrator.findGameById(id);
 
-    if (g != null && orchestrator.isGameReady(g)) {
-      GameMessage gm = new GameMessage(
-        g.getId(),
-        g.getPlayer1(),
-        g.getPlayer2(),
-        Game.getActivePlayer(g),
-        Game.getPieces(g)
-      );
-      GameState gs = new GameState("READY", gm);
-      return gson.toJson(gs, GameState.class);
-    }
-    return null;
+    GameMessage gm = new GameMessage(
+      g.getId(),
+      g.getPlayer1(),
+      g.getPlayer2(),
+      Game.getActivePlayer(g),
+      Game.getPieces(g)
+    );
+    GameState gs = new GameState("READY", gm);
+    return gson.toJson(gs, GameState.class);
   }
 
   @MessageMapping("/game/{id}/select-piece")
