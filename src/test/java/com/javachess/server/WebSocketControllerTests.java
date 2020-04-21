@@ -7,8 +7,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class WebSocketControllerTests {
 
-  @Value("${local.server.port}")
+  @LocalServerPort
   private int port;
 
   private WebSocketStompClient client1;
@@ -73,6 +75,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(2)
   @DisplayName("It should respond with a game id")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void lookForGame() throws Exception {
     CompletableFuture<String> resultKeeper = new CompletableFuture<>();
 
@@ -93,6 +96,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(3)
   @DisplayName("It respond on the endpoint of the game room")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void joinRoom() throws Exception {
     CompletableFuture<String> lfgKeeper = new CompletableFuture<>();
     CompletableFuture<String> resultKeeper = new CompletableFuture<>();
@@ -122,6 +126,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(4)
   @DisplayName("handleSelectPiece should send /queue/game/{id}/possible-moves with an array of positions")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void selectPiece() throws Exception {
     CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
@@ -159,6 +164,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(5)
   @DisplayName("performMove should send /queue/game/{id}/piece-moved with a new game state")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void performMove() throws Exception {
     CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
@@ -197,6 +203,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(6)
   @DisplayName("performMove should send /queue/game/{id}/piece-moved with an error")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void performMoveNotAllowed() throws Exception {
     CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
@@ -235,6 +242,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(7)
   @DisplayName("performMove should send /queue/game/{id}/piece-moved with a piece that moved twice")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void performMoveShouldWorkTwice() throws Exception {
     CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
@@ -282,6 +290,7 @@ public class WebSocketControllerTests {
   @Test
   @Order(8)
   @DisplayName("performMove should send to /queue/game/{id}/piece-moved a the same game object with an error message if it's not the player turn")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
   public void performMoveNotYourTurn() throws Exception {
     CompletableFuture<String> lfgAckMessage = new CompletableFuture<>();
     CompletableFuture<String> readyMessage = new CompletableFuture<>();

@@ -3,6 +3,7 @@ package com.javachess.server;
 import com.google.gson.Gson;
 import com.javachess.logic.*;
 import com.javachess.server.message.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
@@ -12,11 +13,8 @@ import java.util.Optional;
 @Controller
 public class WebSocketController {
 
+  @Autowired
   private GameOrchestrator orchestrator;
-
-  public WebSocketController() {
-    this.orchestrator = new GameOrchestrator();
-  }
 
   @MessageMapping("/lfg")
   @SendToUser("/queue/lfg/ack")
