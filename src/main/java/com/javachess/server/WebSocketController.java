@@ -16,27 +16,6 @@ public class WebSocketController {
   @Autowired
   private GameOrchestrator orchestrator;
 
-  @MessageMapping("/lfg")
-  @SendToUser("/queue/lfg/ack")
-  public String handleLFG(
-    @Payload String messageString
-  ) throws Exception {
-    Gson gson = new Gson();
-    LookingForGameIn input = gson.fromJson(messageString, LookingForGameIn.class);
-
-    Game game = orchestrator.registerPlayer(Player.of(input.getEmail()));
-    // Add logic for assigning the user
-    // Check if that email is already assigned to a game, if yes, reconnect him by sending data of that game
-    // Otherwise assign him on a game with creating status, or a new game
-
-    LookingForGameOut output = new LookingForGameOut(
-      String.format("Hi %s, looking for opponent ...", input.getEmail()),
-      game.getId()
-    );
-
-    return gson.toJson(output);
-  }
-
   @MessageMapping("/game/{id}/join")
   @SendTo("/queue/game/{id}/ready")
   public String handleGameComplete(
@@ -53,15 +32,22 @@ public class WebSocketController {
     // Should be find game by ID and that should fix the tests as we would then return game with id 2
     Game g = orchestrator.findGameById(id);
 
-    GameMessage gm = new GameMessage(
-      g.getId(),
-      g.getPlayer1(),
-      g.getPlayer2(),
-      Game.getActivePlayer(g),
-      Game.getPieces(g)
-    );
-    GameState gs = new GameState("READY", gm);
-    return gson.toJson(gs, GameState.class);
+
+    // We only start the game if the game is full
+    if (Game.isComplete(g)) {
+      GameMessage gm = new GameMessage(
+        g.getId(),
+        g.getPlayer1(),
+        g.getPlayer2(),
+        Game.getActivePlayer(g),
+        Game.getPieces(g)
+      );
+      GameState gs = new GameState("READY", gm);
+      return gson.toJson(gs, GameState.class);
+    }
+    else {
+      return null;
+    }
   }
 
   @MessageMapping("/game/{id}/select-piece")
