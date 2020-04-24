@@ -1,4 +1,4 @@
-from openjdk:12-alpine
+FROM openjdk:12-alpine
 
 RUN apk add --no-cache curl tar bash
 ARG MAVEN_VERSION=3.3.9
@@ -15,6 +15,6 @@ WORKDIR /chess
 
 COPY . .
 
-RUN mvn package
+RUN make package
 
-CMD mvn spring-boot:run
+CMD make run
