@@ -91,27 +91,6 @@ public class WebSocketControllerTests {
     assertEquals(this.session1.isConnected(), true);
   }
 
-//  @Test
-//  @Order(2)
-//  @DisplayName("It should respond with a game id")
-//  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-//  public void lookForGame() throws Exception {
-//    CompletableFuture<String> resultKeeper = new CompletableFuture<>();
-//
-//    this.session1.subscribe("/user/queue/lfg/ack", new TestStompFrameHandler(payload -> {
-//      resultKeeper.complete(payload);
-//    }));
-//    Thread.currentThread().sleep(300);
-//
-//    this.session1.send("/app/lfg", "{email: test1}");
-//    Thread.currentThread().sleep(300);
-//    // Needed to complete a game and reset for other tests
-//    this.session2.send("/app/lfg", "{email: test2}");
-//    Thread.currentThread().sleep(300);
-//
-//    assertEquals("{\"message\":\"Hi test1, looking for opponent ...\",\"gameId\":1}", resultKeeper.get(2, TimeUnit.SECONDS));
-//  }
-
   @Test
   @Order(3)
   @DisplayName("It respond on the endpoint of the game room")
@@ -123,7 +102,6 @@ public class WebSocketControllerTests {
     this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
     this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
 
-    Gson gson = new Gson();
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload ->
       resultKeeper.complete(payload)
     ));
@@ -262,7 +240,6 @@ public class WebSocketControllerTests {
 
     this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
     this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
-
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload ->
       readyMessage.complete(payload)
