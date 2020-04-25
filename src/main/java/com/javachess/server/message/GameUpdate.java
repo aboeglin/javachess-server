@@ -35,11 +35,17 @@ public class GameUpdate {
 
   public GameUpdate(String status, Game game, ErrorCode errorCode, String errorMessage) {
     this.status = status;
-    this.game = new GameState(game);
     this.errorMessage = errorMessage;
     this.errorCode = errorCode;
     this.error = true;
     this.possibleMoves = new Position[]{};
+
+    if (game == null) {
+      this.game = null;
+    }
+    else {
+      this.game = new GameState(game);
+    }
   }
 }
 

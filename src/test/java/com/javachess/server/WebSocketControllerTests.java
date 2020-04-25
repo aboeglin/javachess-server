@@ -99,17 +99,37 @@ public class WebSocketControllerTests {
     CompletableFuture<String> resultKeeper = new CompletableFuture<>();
 
     // Refactor and move this in a BeforeEach ?
-    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
-    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload ->
       resultKeeper.complete(payload)
     ));
     Thread.currentThread().sleep(300);
 
-    this.session2.send("/app/game/1/join", "{email: test2}");
+    this.session2.send("/app/game/1/join", "{playerId: 2}");
     Thread.currentThread().sleep(300);
-    this.session1.send("/app/game/1/join", "{email: test1}");
+    this.session1.send("/app/game/1/join", "{playerId: 1}");
+
+    SnapshotMatcher.expect(resultKeeper.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
+  }
+
+  @Test
+  @DisplayName("It should deny users that aren't part of the game")
+  @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+  public void joinGameBadUser() throws Exception {
+    CompletableFuture<String> resultKeeper = new CompletableFuture<>();
+
+    // Refactor and move this in a BeforeEach ?
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
+
+    this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload ->
+      resultKeeper.complete(payload)
+    ));
+    Thread.currentThread().sleep(300);
+
+    this.session1.send("/app/game/1/join", "{playerId: \"wrong\"}");
 
     SnapshotMatcher.expect(resultKeeper.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
   }
@@ -122,8 +142,8 @@ public class WebSocketControllerTests {
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
     CompletableFuture<String> possibleMovesMessage = new CompletableFuture<>();
 
-    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
-    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload ->
       readyMessage.complete(payload)
@@ -138,6 +158,8 @@ public class WebSocketControllerTests {
     this.session1.send("/app/game/1/join", "{email: test1}");
     Thread.currentThread().sleep(100);
 
+    // TODO: Add test and fix edge case. This should not be allowed as the game was joined with userId 1, and not test1.
+    // Also, email is not valid anymore and playerId should be used instead.
     this.session1.send("/app/game/1/select-piece", "{email: test1, x: b, y: 2}");
 
     SnapshotMatcher.expect(possibleMovesMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
@@ -151,8 +173,8 @@ public class WebSocketControllerTests {
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
     CompletableFuture<String> stateMessage = new CompletableFuture<>();
 
-    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
-    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload -> readyMessage.complete(payload)));
     this.session1.subscribe("/queue/game/1/piece-moved", new TestStompFrameHandler(payload -> stateMessage.complete(payload)));
@@ -164,6 +186,8 @@ public class WebSocketControllerTests {
     this.session1.send("/app/game/1/join", "{email: test1}");
     Thread.currentThread().sleep(300);
 
+    // TODO: Add test and fix edge case. This should not be allowed as the game was joined with userId 1, and not test1.
+    // Also, email is not valid anymore and playerId should be used instead.
     this.session1.send("/app/game/1/perform-move", "{email: test1, fromX: b, fromY: 2, toX: b, toY: 3}");
 
     SnapshotMatcher.expect(stateMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
@@ -177,8 +201,8 @@ public class WebSocketControllerTests {
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
     CompletableFuture<String> stateMessage = new CompletableFuture<>();
 
-    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
-    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload -> readyMessage.complete(payload)));
     this.session1.subscribe("/queue/game/1/piece-moved", new TestStompFrameHandler(payload -> stateMessage.complete(payload)));
@@ -189,6 +213,8 @@ public class WebSocketControllerTests {
     this.session1.send("/app/game/1/join", "{email: 1}");
     Thread.currentThread().sleep(300);
 
+    // TODO: Add test and fix edge case. This should not be allowed as the game was joined with userId 1, and not test1.
+    // Also, email is not valid anymore and playerId should be used instead.
     this.session1.send("/app/game/1/perform-move", "{email: test1, fromX: b, fromY: 2, toX: b, toY: 5}");
 
     SnapshotMatcher.expect(stateMessage.get(10, TimeUnit.SECONDS)).toMatchSnapshot();
@@ -202,8 +228,8 @@ public class WebSocketControllerTests {
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
     CompletableFuture<String> stateMessage = new CompletableFuture<>();
 
-    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
-    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload -> readyMessage.complete(payload)));
 
@@ -221,6 +247,8 @@ public class WebSocketControllerTests {
     this.session1.send("/app/game/1/join", "{email: test1}");
     Thread.currentThread().sleep(300);
 
+    // TODO: Add test and fix edge case. This should not be allowed as the game was joined with userId 1, and not test1.
+    // Also, email is not valid anymore and playerId should be used instead.
     this.session1.send("/app/game/1/perform-move", "{email: test1, fromX: b, fromY: 2, toX: b, toY: 3}");
     Thread.currentThread().sleep(300);
     this.session1.send("/app/game/1/perform-move", "{email: test1, fromX: b, fromY: 7, toX: b, toY: 6}");
@@ -238,8 +266,8 @@ public class WebSocketControllerTests {
     CompletableFuture<String> readyMessage = new CompletableFuture<>();
     CompletableFuture<String> stateMessage = new CompletableFuture<>();
 
-    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"userId\":\"1\"}", String.class);
-    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"userId\":\"2\"}", String.class);
+    this.restTemplate.postForEntity("http://localhost:" + port + "/games", "{\"playerId\":\"1\"}", String.class);
+    this.restTemplate.patchForObject("http://localhost:" + port + "/games/1", "{\"playerId\":\"2\"}", String.class);
 
     this.session1.subscribe("/queue/game/1/ready", new TestStompFrameHandler(payload ->
       readyMessage.complete(payload)
@@ -255,6 +283,8 @@ public class WebSocketControllerTests {
     this.session1.send("/app/game/1/join", "{email: test1}");
     Thread.currentThread().sleep(300);
 
+    // TODO: Add test and fix edge case. This should not be allowed as the game was joined with userId 1, and not test1.
+    // Also, email is not valid anymore and playerId should be used instead.
     this.session1.send("/app/game/1/perform-move", "{email: test1, fromX: b, fromY: 7, toX: b, toY: 6}");
     Thread.currentThread().sleep(300);
 

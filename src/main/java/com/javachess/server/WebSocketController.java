@@ -18,23 +18,28 @@ public class WebSocketController {
 
   @MessageMapping("/game/{id}/join")
   @SendTo("/queue/game/{id}/ready")
-  public String handleGameComplete(@Payload String messageString, @DestinationVariable("id") int id) {
+  public String handleJoinGame(@Payload String messageString, @DestinationVariable("id") int id) {
     Gson gson = new Gson();
-    JoinGameIn input = gson.fromJson(messageString, JoinGameIn.class);
+    JoinGame input = gson.fromJson(messageString, JoinGame.class);
 
     // Look up the dude, find the game, if complete, return game ready with initial board to players
-    Player p = Player.of(input.getEmail());
+    Player p = Player.of(input.getPlayerId());
     orchestrator.join(p);
 
     // Should be find game by ID and that should fix the tests as we would then return game with id 2
     Game g = orchestrator.findGameById(id);
 
+    // TODO: Write Game::hasPlayer(String id), and/or Game::hasPlayer(Player p)
+    if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
+      return gson.toJson(new GameUpdate("NOT_STARTED", null, ErrorCode.PLAYER_NOT_IN_GAME, "You are not in this game !"));
+    }
 
     // We only start the game if the game is full
     if (Game.isComplete(g)) {
       return gson.toJson(new GameUpdate("READY", g), GameUpdate.class);
     }
     else {
+      // TODO: return a message that says it waits for a second user ?
       return null;
     }
   }
@@ -95,5 +100,4 @@ public class WebSocketController {
     exception.printStackTrace();
     return exception.getMessage();
   }
-
 }

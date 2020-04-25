@@ -1,22 +1,22 @@
 package com.javachess.server.message;
 
 public class SelectPiece {
-  private String email;
+  private String playerId;
   private String x;
   private String y;
 
-  public SelectPiece(String email, String x, String y) {
-    this.email = email;
+  public SelectPiece(String playerId, String x, String y) {
+    this.playerId = playerId;
     this.x = x;
     this.y = y;
   }
 
-  public String getEmail() {
-    return email;
+  public String getPlayerId() {
+    return playerId;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setPlayerId(String playerId) {
+    this.playerId = playerId;
   }
 
   public String getX() {
