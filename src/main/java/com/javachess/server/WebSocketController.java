@@ -32,9 +32,7 @@ public class WebSocketController {
 
     // We only start the game if the game is full
     if (Game.isComplete(g)) {
-      GameState gm = new GameState(g);
-      GameUpdate gs = new GameUpdate("READY", gm);
-      return gson.toJson(gs, GameUpdate.class);
+      return gson.toJson(new GameUpdate("READY", g), GameUpdate.class);
     }
     else {
       return null;
@@ -50,8 +48,7 @@ public class WebSocketController {
 
     if (g != null) {
       Position[] moves = Game.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
-      PossibleMoves response = new PossibleMoves(moves);
-      return gson.toJson(response, PossibleMoves.class);
+      return gson.toJson(new GameUpdate("UPDATE", g, moves), GameUpdate.class);
     }
 
     return null;
@@ -73,21 +70,18 @@ public class WebSocketController {
         if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(game), movingPiece.get())) {
           Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
 
-          GameState gm = new GameState(newGame);
-
           // If it's the same reference, that means that the game was not updated and therefore
           // that the move was not allowed for some reason.
           if (newGame == game) {
-            response = new GameUpdate("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+            response = new GameUpdate("UPDATE", newGame, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
           }
           else {
-            response = new GameUpdate("UPDATE", gm);
+            response = new GameUpdate("UPDATE", newGame);
           }
         }
         else {
           // Piece can't move there
-          GameState gm = new GameState(game);
-          response = new GameUpdate("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+          response = new GameUpdate("UPDATE", game, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
         }
       }
     }
