@@ -1,15 +1,9 @@
 package com.javachess.exception;
 
-public class GameAlreadyFullException extends Exception {
+import com.javachess.server.message.ErrorCode;
 
-  private String message;
-
+public class GameAlreadyFullException extends ChessException {
   public GameAlreadyFullException(String message) {
-    this.message = message;
-  }
-
-  @Override
-  public String getMessage() {
-    return this.message;
+    super(ErrorCode.GAME_ALREADY_FULL, message);
   }
 }

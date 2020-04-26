@@ -55,9 +55,6 @@ public class RestController {
     } catch(GameAlreadyFullException e) {
       return new ResponseEntity("{\"message\":\"This game is already full !\"}", HttpStatus.CONFLICT);
     }
-
-
-
   }
 }
 

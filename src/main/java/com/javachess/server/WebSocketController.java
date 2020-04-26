@@ -1,6 +1,7 @@
 package com.javachess.server;
 
 import com.google.gson.Gson;
+import com.javachess.exception.*;
 import com.javachess.logic.*;
 import com.javachess.server.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class WebSocketController {
 
   @MessageMapping("/game/{id}/join")
   @SendTo("/queue/game/{id}/ready")
-  public String handleJoinGame(@Payload String messageString, @DestinationVariable("id") int id) {
+  public String handleJoinGame(@Payload String messageString, @DestinationVariable("id") int id) throws PlayerNotInGameException, GameNotFoundException {
     Gson gson = new Gson();
     JoinGame input = gson.fromJson(messageString, JoinGame.class);
 
@@ -29,9 +30,13 @@ public class WebSocketController {
     // Should be find game by ID and that should fix the tests as we would then return game with id 2
     Game g = orchestrator.findGameById(id);
 
+    if (g == null) {
+      throw new GameNotFoundException("The game was not found !");
+    }
+
     // TODO: Write Game::hasPlayer(String id), and/or Game::hasPlayer(Player p)
     if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
-      return gson.toJson(new GameUpdate("NOT_STARTED", null, ErrorCode.PLAYER_NOT_IN_GAME, "You are not in this game !"));
+      throw new PlayerNotInGameException("You are not in this game !");
     }
 
     // We only start the game if the game is full
@@ -46,28 +51,28 @@ public class WebSocketController {
 
   @MessageMapping("/game/{id}/select-piece")
   @SendTo("/queue/game/{id}/possible-moves")
-  public String handleSelectPiece(@Payload String messageString, @DestinationVariable("id") int id) {
+  public String handleSelectPiece(@Payload String messageString, @DestinationVariable("id") int id) throws PlayerNotInGameException, GameNotFoundException {
     Gson gson = new Gson();
     SelectPiece input = gson.fromJson(messageString, SelectPiece.class);
     Game g = orchestrator.findGameById(id);
     Player p = Player.of(input.getPlayerId());
 
-    if (g != null) {
-      if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
-        return gson.toJson(new GameUpdate("USER_NOT_ALLOWED", null, ErrorCode.PLAYER_NOT_IN_GAME, "You are not in this game !"));
-      }
-
-      Position[] moves = Game.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
-      return gson.toJson(new GameUpdate("UPDATE", g, moves), GameUpdate.class);
+    if (g == null) {
+      throw new GameNotFoundException("The game was not found !");
     }
 
-    // TODO: Make it return GAME_NOT_FOUND error !
-    return null;
+    if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
+      throw new PlayerNotInGameException("You are not in this game !");
+    }
+
+    Position[] moves = Game.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
+    return gson.toJson(new GameUpdate("UPDATE", g, moves), GameUpdate.class);
   }
 
   @MessageMapping("/game/{id}/perform-move")
   @SendTo("/queue/game/{id}/piece-moved")
-  public String handlePerformMove(@Payload String messageString, @DestinationVariable("id") int id) {
+  public String handlePerformMove(@Payload String messageString, @DestinationVariable("id") int id)
+    throws NotYourTurnException, MoveNotAllowedException, PlayerNotInGameException, GameNotFoundException {
     Gson gson = new Gson();
     PerformMove input = gson.fromJson(messageString, PerformMove.class);
     Player p = Player.of(input.getPlayerId());
@@ -75,30 +80,32 @@ public class WebSocketController {
     Game g = orchestrator.findGameById(id);
     GameUpdate response = null;
 
-    if (g != null) {
-      if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
-        return gson.toJson(new GameUpdate("USER_NOT_ALLOWED", null, ErrorCode.PLAYER_NOT_IN_GAME, "You are not in this game !"));
-      }
+    if (g == null) {
+      throw new GameNotFoundException("The game was not found !");
+    }
 
-      Optional<Piece> movingPiece = Game.getPieceAt(input.getFromX(), input.getFromY(), g);
+    if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
+      throw new PlayerNotInGameException("You are not in this game !");
+    }
 
-      if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(g), movingPiece.get())) {
-          Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), g);
+    Optional<Piece> movingPiece = Game.getPieceAt(input.getFromX(), input.getFromY(), g);
 
-          // If it's the same reference, that means that the game was not updated and therefore
-          // that the move was not allowed for some reason.
-          if (newGame == g) {
-            response = new GameUpdate("UPDATE", newGame, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
-          }
-          else {
-            response = new GameUpdate("UPDATE", newGame);
-          }
+    if (movingPiece.isPresent()) {
+      if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(g), movingPiece.get())) {
+        Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), g);
+
+        // If it's the same reference, that means that the game was not updated and therefore
+        // that the move was not allowed for some reason.
+        if (newGame == g) {
+          throw new NotYourTurnException("It's not your turn !");
         }
         else {
-          // Piece can't move there
-          response = new GameUpdate("UPDATE", g, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+          response = new GameUpdate("UPDATE", newGame);
         }
+      }
+      else {
+        // Piece can't move there
+        throw new MoveNotAllowedException("This move is not valid !");
       }
     }
 
@@ -107,8 +114,10 @@ public class WebSocketController {
 
   @MessageExceptionHandler
   @SendToUser("/queue/errors")
-  public String handleException(Throwable exception) {
-    exception.printStackTrace();
-    return exception.getMessage();
+  public String handleException(ChessException e) {
+    e.printStackTrace();
+
+    Gson gson = new Gson();
+    return gson.toJson(new GameUpdate("ERROR", null, e.getErrorCode(), e.getMessage()), GameUpdate.class);
   }
 }

@@ -2,6 +2,7 @@ package com.javachess.server;
 
 import com.javachess.exception.GameAlreadyFullException;
 import com.javachess.logic.*;
+import com.javachess.server.message.ErrorCode;
 import com.javachess.util.fp.F;
 import org.springframework.stereotype.Component;
 
