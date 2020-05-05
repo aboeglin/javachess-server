@@ -32,6 +32,9 @@ public class Player {
   }
 
   public boolean equals(Object o) {
+    if (o == null) {
+      return false;
+    }
     if (o instanceof Player) {
       return ((Player) o).getId().equals(this.getId());
     }

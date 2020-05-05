@@ -1,6 +1,7 @@
 package com.javachess.server;
 
 import com.google.gson.Gson;
+import com.javachess.exception.GameAlreadyFullException;
 import com.javachess.logic.Game;
 import com.javachess.logic.Player;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class RestController {
   public ResponseEntity createGame(@RequestBody String payload) {
     Gson gson = new Gson();
     UserMessage input = gson.fromJson(payload, UserMessage.class);
-    Player p = Player.of(input.getUserId());
+    Player p = Player.of(input.getPlayerId());
     Game response = this.orchestrator.createGame(p);
     return new ResponseEntity(response, HttpStatus.OK);
   }
@@ -48,19 +49,23 @@ public class RestController {
   public ResponseEntity joinGame(@PathVariable(name = "id") int gameId, @RequestBody String payload) {
     Gson gson = new Gson();
     UserMessage input = gson.fromJson(payload, UserMessage.class);
-    Player p = Player.of(input.getUserId());
-    return new ResponseEntity(this.orchestrator.joinGameById(p, gameId), HttpStatus.OK);
+    Player p = Player.of(input.getPlayerId());
+    try {
+      return new ResponseEntity(this.orchestrator.joinGameById(p, gameId), HttpStatus.OK);
+    } catch(GameAlreadyFullException e) {
+      return new ResponseEntity("{\"message\":\"This game is already full !\"}", HttpStatus.CONFLICT);
+    }
   }
 }
 
 class UserMessage {
-  private String userId;
+  private String playerId;
 
-  public String getUserId() {
-    return userId;
+  public String getPlayerId() {
+    return playerId;
   }
 
-  public void setUserId(String userId) {
-    this.userId = userId;
+  public void setPlayerId(String playerId) {
+    this.playerId = playerId;
   }
 }

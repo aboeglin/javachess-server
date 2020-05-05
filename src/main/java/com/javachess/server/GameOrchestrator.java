@@ -1,6 +1,8 @@
 package com.javachess.server;
 
+import com.javachess.exception.GameAlreadyFullException;
 import com.javachess.logic.*;
+import com.javachess.server.message.ErrorCode;
 import com.javachess.util.fp.F;
 import org.springframework.stereotype.Component;
 
@@ -81,9 +83,11 @@ public class GameOrchestrator {
     ).apply(this.games);
   }
 
-  public Game joinGameById(Player p, int id) {
-    // TODO: Verify that game is not already full
+  public Game joinGameById(Player p, int id) throws GameAlreadyFullException {
     Game g = this.findGameById(id);
+    if (Game.isComplete(g)) {
+      throw new GameAlreadyFullException("This game is already full !");
+    }
     Game joined = Game.addPlayer(p, g);
     this.games.remove(g);
     this.games.add(joined);

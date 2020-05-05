@@ -1,6 +1,7 @@
 package com.javachess.server;
 
 import com.google.gson.Gson;
+import com.javachess.exception.*;
 import com.javachess.logic.*;
 import com.javachess.server.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,116 +19,105 @@ public class WebSocketController {
 
   @MessageMapping("/game/{id}/join")
   @SendTo("/queue/game/{id}/ready")
-  public String handleGameComplete(
-    @Payload String messageString,
-    @DestinationVariable("id") int id
-  ) throws Exception {
+  public String handleJoinGame(@Payload String messageString, @DestinationVariable("id") int id) throws PlayerNotInGameException, GameNotFoundException {
     Gson gson = new Gson();
-    JoinGameIn input = gson.fromJson(messageString, JoinGameIn.class);
+    JoinGame input = gson.fromJson(messageString, JoinGame.class);
 
     // Look up the dude, find the game, if complete, return game ready with initial board to players
-    Player p = Player.of(input.getEmail());
+    Player p = Player.of(input.getPlayerId());
     orchestrator.join(p);
 
     // Should be find game by ID and that should fix the tests as we would then return game with id 2
     Game g = orchestrator.findGameById(id);
 
+    if (g == null) {
+      throw new GameNotFoundException("The game was not found !");
+    }
+
+    // TODO: Write Game::hasPlayer(String id), and/or Game::hasPlayer(Player p)
+    if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
+      throw new PlayerNotInGameException("You are not in this game !");
+    }
 
     // We only start the game if the game is full
     if (Game.isComplete(g)) {
-      GameMessage gm = new GameMessage(
-        g.getId(),
-        g.getPlayer1(),
-        g.getPlayer2(),
-        Game.getActivePlayer(g),
-        Game.getPieces(g)
-      );
-      GameState gs = new GameState("READY", gm);
-      return gson.toJson(gs, GameState.class);
+      return gson.toJson(new GameUpdate("READY", g), GameUpdate.class);
     }
     else {
+      // TODO: return a message that says it waits for a second user ?
       return null;
     }
   }
 
   @MessageMapping("/game/{id}/select-piece")
   @SendTo("/queue/game/{id}/possible-moves")
-  public String handleSelectPiece(
-    @Payload String messageString,
-    @DestinationVariable("id") int id
-  ) {
+  public String handleSelectPiece(@Payload String messageString, @DestinationVariable("id") int id) throws PlayerNotInGameException, GameNotFoundException {
     Gson gson = new Gson();
     SelectPiece input = gson.fromJson(messageString, SelectPiece.class);
     Game g = orchestrator.findGameById(id);
+    Player p = Player.of(input.getPlayerId());
 
-    if (g != null) {
-      Position[] moves = Game.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
-      PossibleMoves response = new PossibleMoves(moves);
-      return gson.toJson(response, PossibleMoves.class);
+    if (g == null) {
+      throw new GameNotFoundException("The game was not found !");
     }
 
-    return null;
+    if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
+      throw new PlayerNotInGameException("You are not in this game !");
+    }
+
+    Position[] moves = Game.getPossibleMoves(input.getX(), input.getY(), Game.getPieces(g));
+    return gson.toJson(new GameUpdate("UPDATE", g, moves), GameUpdate.class);
   }
 
   @MessageMapping("/game/{id}/perform-move")
   @SendTo("/queue/game/{id}/piece-moved")
-  public String handlePerformMove(
-    @Payload String messageString,
-    @DestinationVariable("id") int id
-  ) {
+  public String handlePerformMove(@Payload String messageString, @DestinationVariable("id") int id)
+    throws NotYourTurnException, MoveNotAllowedException, PlayerNotInGameException, GameNotFoundException {
     Gson gson = new Gson();
     PerformMove input = gson.fromJson(messageString, PerformMove.class);
+    Player p = Player.of(input.getPlayerId());
 
-    Game game = orchestrator.findGameById(id);
-    GameState response = null;
+    Game g = orchestrator.findGameById(id);
+    GameUpdate response = null;
 
-    if (game != null) {
-      Optional<Piece> movingPiece = Game.getPieceAt(input.getFromX(), input.getFromY(), game);
+    if (g == null) {
+      throw new GameNotFoundException("The game was not found !");
+    }
 
-      if (movingPiece.isPresent()) {
-        if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(game), movingPiece.get())) {
-          Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), game);
+    if (!p.equals(g.getPlayer1()) && !p.equals(g.getPlayer2())) {
+      throw new PlayerNotInGameException("You are not in this game !");
+    }
 
-          GameMessage gm = new GameMessage(
-            newGame.getId(),
-            newGame.getPlayer1(),
-            newGame.getPlayer2(),
-            Game.getActivePlayer(newGame),
-            Game.getPieces(newGame)
-          );
+    Optional<Piece> movingPiece = Game.getPieceAt(input.getFromX(), input.getFromY(), g);
 
-          // If it's the same reference, that means that the game was not updated and therefore
-          // that the move was not allowed for some reason.
-          if (newGame == game) {
-            response = new GameState("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
-          }
-          else {
-            response = new GameState("UPDATE", gm);
-          }
+    if (movingPiece.isPresent()) {
+      if (Piece.canMoveTo(input.getToX(), input.getToY(), Game.getPieces(g), movingPiece.get())) {
+        Game newGame = orchestrator.performMove(input.getFromX(), input.getFromY(), input.getToX(), input.getToY(), g);
+
+        // If it's the same reference, that means that the game was not updated and therefore
+        // that the move was not allowed for some reason.
+        if (newGame == g) {
+          throw new NotYourTurnException("It's not your turn !");
         }
         else {
-          // Piece can't move there
-          GameMessage gm = new GameMessage(
-            game.getId(),
-            game.getPlayer1(),
-            game.getPlayer2(),
-            Game.getActivePlayer(game),
-            Game.getPieces(game)
-          );
-          response = new GameState("UPDATE", gm, ErrorCode.MOVE_NOT_ALLOWED, "You cannot move to that position !");
+          response = new GameUpdate("UPDATE", newGame);
         }
+      }
+      else {
+        // Piece can't move there
+        throw new MoveNotAllowedException("This move is not valid !");
       }
     }
 
-    return gson.toJson(response, GameState.class);
-
+    return gson.toJson(response, GameUpdate.class);
   }
 
   @MessageExceptionHandler
   @SendToUser("/queue/errors")
-  public String handleException(Throwable exception) {
-    exception.printStackTrace();
-    return exception.getMessage();
-  }
+  public String handleException(ChessException e) {
+    e.printStackTrace();
 
+    Gson gson = new Gson();
+    return gson.toJson(new GameUpdate("ERROR", null, e.getErrorCode(), e.getMessage()), GameUpdate.class);
+  }
 }

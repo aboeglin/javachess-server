@@ -2,30 +2,30 @@ package com.javachess.server.message;
 
 public class PerformMove {
 
-  private String email;
+  private String playerId;
   private String fromX;
   private String fromY;
   private String toX;
   private String toY;
 
   public PerformMove(
-    String email,
+    String playerId,
     String fromX, String fromY,
     String toX, String toY
   ) {
-    this.email = email;
+    this.playerId = playerId;
     this.fromX = fromX;
     this.fromY = fromY;
     this.toX = toX;
     this.toY = toY;
   }
 
-  public String getEmail() {
-    return email;
+  public String getPlayerId() {
+    return playerId;
   }
 
-  public void setEmail(String email) {
-    this.email = email;
+  public void setPlayerId(String playerId) {
+    this.playerId = playerId;
   }
 
   public String getFromX() {
