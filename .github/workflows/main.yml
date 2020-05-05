@@ -29,24 +29,20 @@ jobs:
           tags: "release-${{ github.run_number }},latest"
 
   deploy:
+    if: github.ref == 'refs/heads/master'
     needs: build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Pull image
-        uses: appleboy/ssh-action@master
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
-          host: easychess.xyz
-          username: root
-          key: ${{ secrets.PRIVATE_KEY }}
-          script: docker pull arnaudboeglin/javachess-server:latest
-      - name: Update service
-        uses: appleboy/ssh-action@master
-        with:
-          host: easychess.xyz
-          username: root
-          key: ${{ secrets.PRIVATE_KEY }}
-          script: cd /opt && docker-compose up -d
+          token: ${{ secrets.DO_TOKEN }}
+      - name: Save DigitalOcean kubeconfig
+        env:
+          CLUSTER_NAME: ${{ secrets.CLUSTER_NAME }}
+        run: doctl kubernetes cluster kubeconfig save $CLUSTER_NAME
+      - name: Update container image
+        run: kubectl -n apps set image deployment/server "server=arnaudboeglin/javachess-server:release-${{ github.run_number }}" --record
 
   report:
     needs: test
