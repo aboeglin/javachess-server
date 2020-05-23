@@ -12,13 +12,7 @@ import java.util.Collections;
 public class Application {
 
   public static void main(String[] args) {
-    String port = System.getenv("PORT");
-    if (port == null) {
-      port = "80";
-    }
-    SpringApplication app = new SpringApplication(Application.class);
-    app.setDefaultProperties(Collections.singletonMap("server.port", port));
-    app.run(args);
+    new SpringApplication(Application.class).run(args);
   }
 
 }
